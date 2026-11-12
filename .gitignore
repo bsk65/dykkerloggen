@@ -11,3 +11,6 @@ dev-dist
 
 # Firebase-nøgler — brug .env.example som skabelon
 .env
+
+# Importfiler med personlige data (dyk fra SSI)
+import/

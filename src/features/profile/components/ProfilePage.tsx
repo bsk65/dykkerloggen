@@ -7,6 +7,7 @@ import { Button } from '../../../shared/ui/Button'
 import { LangToggle } from '../../../shared/ui/LangToggle'
 import { OfflineStatusLine } from '../../../shared/ui/OfflineStatusLine'
 import { useAuthActions } from '../../auth/hooks/useAuthActions'
+import { ImportDivesSection } from '../../dives/components/ImportDivesSection'
 import { useCertificates } from '../hooks/useCertificates'
 import { certificateImagePaths } from '../logic/certificates'
 import type { Certificate } from '../types'
@@ -15,7 +16,7 @@ import { CertificateViewer } from './CertificateViewer'
 import { ProfileHeader } from './ProfileHeader'
 import styles from './ProfilePage.module.css'
 
-/** Profil: navn, certifikater (også uden dækning) og indstillinger. */
+/** Profil: navn, certifikater (også uden dækning), import af dyk og indstillinger. */
 export function ProfilePage() {
   const { t } = useT()
   const { logout } = useAuthActions()
@@ -50,6 +51,8 @@ export function ProfilePage() {
           ))}
         </ul>
       </section>
+
+      <ImportDivesSection />
 
       <section className={styles.section}>
         <h2 className={styles.heading}>{t('profile.settings')}</h2>

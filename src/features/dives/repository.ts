@@ -6,6 +6,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  writeBatch,
   type Unsubscribe,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
@@ -65,6 +66,23 @@ export function createDive(uid: string, data: DiveData): { id: string; written: 
     updatedAt: serverTimestamp(),
   })
   return { id: ref.id, written }
+}
+
+/**
+ * Importerer mange dyk på én gang (højst 400 pr. skrivning). Dyk med SSI-id får
+ * dokument-id'et `ssi-<id>`, så samme dyk aldrig kan ligge der to gange.
+ */
+export async function importDives(uid: string, dives: DiveData[]): Promise<void> {
+  for (let i = 0; i < dives.length; i += 400) {
+    const batch = writeBatch(db)
+    for (const dive of dives.slice(i, i + 400)) {
+      const ref = dive.ssiId
+        ? doc(divesCollection(uid), `ssi-${dive.ssiId}`)
+        : doc(divesCollection(uid))
+      batch.set(ref, { ...dive, createdAt: serverTimestamp(), updatedAt: serverTimestamp() })
+    }
+    await batch.commit()
+  }
 }
 
 /** Ændrer et dyk. Som createDive afsluttes løftet først, når serveren har det. */

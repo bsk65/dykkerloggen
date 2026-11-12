@@ -211,10 +211,7 @@ export function parseBuddies(textValue: string): string[] {
  * (dekogas uden dekodyk, nitrox-% uden nitrox), gemmes som tomme.
  * Billederne og kilden røres ikke her — de sættes af den, der gemmer.
  */
-export type DiveFormData = Omit<
-  DiveData,
-  'sitePhotoPath' | 'logbookPagePath' | 'logbookPageSmallPath' | 'source' | 'ssiId'
->
+export type DiveFormData = Omit<DiveData, 'sitePhotoPath' | 'logbookImages' | 'source' | 'ssiId'>
 
 export function formToDive(form: DiveForm): DiveFormData {
   const decoGas = form.deco && form.decoGasUsed

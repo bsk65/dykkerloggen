@@ -9,18 +9,20 @@ import {
 import { step, toSaveFailure, type SaveFailure } from '../../../shared/utils/saveFailure'
 import { useUid } from '../../auth/hooks/useUid'
 import { formToDive, type DiveForm } from '../logic/diveForm'
+import { logbookItemsChanged, removedLogbookImages, type LogbookItem } from '../logic/logbookPages'
 import {
   createDive,
   deleteDive,
   deleteDiveImage,
+  setLogbookImages,
   updateDive,
   uploadLogbookPage,
   uploadSitePhoto,
 } from '../repository'
-import type { Dive } from '../types'
+import type { Dive, LogbookImage } from '../types'
 
-/** Ændringer af dykkets to billeder i formularen. */
-export type DiveImageChanges = { sitePhoto: ImageChange; logbookPage: ImageChange }
+/** Dykkets billeder i formularen: billedet fra stedet og listen af logbogs-/stempelbilleder. */
+export type DiveImageChanges = { sitePhoto: ImageChange; logbook: LogbookItem[] }
 
 export function useSaveDive() {
   const uid = useUid()
@@ -39,26 +41,37 @@ export function useSaveDive() {
     if (change !== 'keep' && oldPath) await deleteDiveImage(oldPath).catch(() => undefined)
   }
 
-  async function saveLogbookPage(diveId: string, existing: Dive | null, change: ImageChange) {
-    const oldPaths = [existing?.logbookPagePath, existing?.logbookPageSmallPath]
-    if (change instanceof File) {
-      const image = await step('image', () => resizeImage(change, LOGBOOK_MAX_SIZE, 0.9))
-      const small = await step('image', () => resizeImage(change, LOGBOOK_SMALL_SIZE, 0.72))
-      const { path, smallPath } = await step('upload', () =>
-        uploadLogbookPage(uid, diveId, image, small),
-      )
-      updateDive(uid, diveId, {
-        logbookPagePath: path,
-        logbookPageSmallPath: smallPath,
-      }).catch(() => undefined)
-    } else if (change === 'remove') {
-      updateDive(uid, diveId, {
-        logbookPagePath: null,
-        logbookPageSmallPath: null,
-      }).catch(() => undefined)
+  async function saveLogbookImages(diveId: string, existing: Dive | null, items: LogbookItem[]) {
+    const saved = existing?.logbookImages ?? []
+    if (!logbookItemsChanged(saved, items)) return
+    const uploaded: LogbookImage[] = []
+    const result: LogbookImage[] = []
+    try {
+      for (const item of items) {
+        if (item.kind === 'saved') {
+          result.push(item.image)
+          continue
+        }
+        const image = await step('image', () => resizeImage(item.file, LOGBOOK_MAX_SIZE, 0.9))
+        const small = await step('image', () => resizeImage(item.file, LOGBOOK_SMALL_SIZE, 0.72))
+        const stored = await step('upload', () => uploadLogbookPage(uid, diveId, image, small))
+        uploaded.push(stored)
+        result.push(stored)
+      }
+    } catch (err) {
+      // Ryd op i de billeder, der nåede op, før fejlen — de bliver ikke brugt.
+      for (const img of uploaded) {
+        await deleteDiveImage(img.path).catch(() => undefined)
+        await deleteDiveImage(img.smallPath).catch(() => undefined)
+      }
+      throw err
     }
-    if (change === 'keep') return
-    for (const path of oldPaths) if (path) await deleteDiveImage(path).catch(() => undefined)
+    setLogbookImages(uid, diveId, result).catch(() => undefined)
+    for (const img of removedLogbookImages(saved, items)) {
+      for (const path of new Set([img.path, img.smallPath])) {
+        await deleteDiveImage(path).catch(() => undefined)
+      }
+    }
   }
 
   /** Gemmer dykket og returnerer dets id — eller null ved fejl. */
@@ -82,8 +95,7 @@ export function useSaveDive() {
         const created = createDive(uid, {
           ...data,
           sitePhotoPath: null,
-          logbookPagePath: null,
-          logbookPageSmallPath: null,
+          logbookImages: [],
           source: 'app',
           ssiId: null,
         })
@@ -91,7 +103,7 @@ export function useSaveDive() {
         created.written.catch(() => undefined)
       }
       await saveSitePhoto(diveId, existing, images.sitePhoto)
-      await saveLogbookPage(diveId, existing, images.logbookPage)
+      await saveLogbookImages(diveId, existing, images.logbook)
       return diveId
     } catch (err) {
       console.error('Dykket kunne ikke gemmes', err)

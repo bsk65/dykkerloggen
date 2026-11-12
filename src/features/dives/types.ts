@@ -83,10 +83,11 @@ export type DiveData = {
 
   /** Billede fra dykkerstedet i Firebase Storage */
   sitePhotoPath: string | null
-  /** Billede af dykket i den gamle papir-logbog (stor version, til at zoome i) */
-  logbookPagePath: string | null
-  /** Lille version af logbogssiden — lægges også på telefonen, så den kan ses uden dækning */
-  logbookPageSmallPath: string | null
+  /**
+   * Billeder, der dokumenterer dykket: siden i papir-logbogen, dykkercentrets
+   * stempel, dykkercomputerens skærm osv.
+   */
+  logbookImages: LogbookImage[]
 
   source: DiveSource
   /** SSI's eget id, når dykket er importeret — så det ikke importeres to gange */
@@ -94,3 +95,11 @@ export type DiveData = {
 }
 
 export type Dive = DiveData & { id: string }
+
+/** Ét dokumentationsbillede i to størrelser. */
+export type LogbookImage = {
+  /** Stor version, til at zoome i */
+  path: string
+  /** Lille version — lægges også på telefonen, så den kan ses uden dækning */
+  smallPath: string
+}

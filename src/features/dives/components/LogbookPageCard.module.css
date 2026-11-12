@@ -34,3 +34,18 @@
   padding: 40px 0;
   color: var(--color-text-muted);
 }
+
+/* Flere billeder: to pr. række. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.thumbSmall {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 10px;
+}

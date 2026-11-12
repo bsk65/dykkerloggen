@@ -29,7 +29,7 @@ export function DiveCard({ dive }: { dive: Dive }) {
         </span>
         <span className={styles.badges}>
           <StarRating value={dive.rating} />
-          {dive.logbookPagePath && (
+          {dive.logbookImages.length > 0 && (
             <span className={styles.logbookIcon} title={t('dives.logbookPage')}>
               📖
             </span>

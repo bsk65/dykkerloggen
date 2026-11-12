@@ -59,8 +59,7 @@ describe('formToDive', () => {
     const dive = {
       ...formToDive(form),
       sitePhotoPath: null,
-      logbookPagePath: null,
-      logbookPageSmallPath: null,
+      logbookImages: [],
       source: 'app' as const,
       ssiId: null,
     }

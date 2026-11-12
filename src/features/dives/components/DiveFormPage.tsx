@@ -8,6 +8,7 @@ import { useDives } from '../hooks/useDives'
 import { useSaveDive, type DiveImageChanges } from '../hooks/useSaveDive'
 import { diveToForm, emptyDiveForm, type DiveForm } from '../logic/diveForm'
 import { groupDivesBySite, nextDiveNumber } from '../logic/diveSites'
+import { savedLogbookItems } from '../logic/logbookPages'
 import type { Dive } from '../types'
 import { ConditionsSection } from './form/ConditionsSection'
 import { DecoSection } from './form/DecoSection'
@@ -44,10 +45,10 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
   const [form, setForm] = useState<DiveForm>(() =>
     existing ? diveToForm(existing) : emptyDiveForm(nextDiveNumber(dives)),
   )
-  const [images, setImages] = useState<DiveImageChanges>({
+  const [images, setImages] = useState<DiveImageChanges>(() => ({
     sitePhoto: 'keep',
-    logbookPage: 'keep',
-  })
+    logbook: savedLogbookItems(existing?.logbookImages ?? []),
+  }))
   const sites = useMemo(
     () => groupDivesBySite(dives.filter((d) => d.id !== existing?.id)),
     [dives, existing],

@@ -9,9 +9,13 @@ export const divesTexts = defineTexts({
     loadError: 'Kunne ikke hente dine dyk. Tjek forbindelsen.',
     saveError: 'Dykket kunne ikke gemmes. Tjek forbindelsen, og prøv igen.',
     deleteError: 'Dykket kunne ikke slettes. Prøv igen.',
-    logbookPage: 'Side fra den gamle logbog',
+    logbookPage: 'Logbog / stempel',
     logbookPageHint:
-      'Billede af dykket i din papir-logbog. Den gemmes også på telefonen, så den kan vises uden dækning.',
+      'Billeder af dykket i papir-logbogen, dykkercentrets stempel eller dykkercomputerens skærm. De gemmes også på telefonen, så de kan vises uden dækning.',
+    logbookAdd: 'Tilføj billede',
+    logbookAddMore: 'Tilføj flere billeder',
+    logbookMax: 'Højst {n} billeder pr. dyk.',
+    logbookImageOf: 'Billede {n} af {total}',
     importTitle: 'Importér dyk',
     importHint:
       'Indlæs dyk fra en importfil, f.eks. dine dyk hentet fra SSI-logbogen. Dyk, der allerede er importeret, springes over.',
@@ -109,9 +113,13 @@ export const divesTexts = defineTexts({
     loadError: 'Could not load your dives. Check your connection.',
     saveError: 'The dive could not be saved. Check your connection and try again.',
     deleteError: 'The dive could not be deleted. Please try again.',
-    logbookPage: 'Page from the old logbook',
+    logbookPage: 'Logbook / stamp',
     logbookPageHint:
-      'Photo of the dive in your paper logbook. It is also stored on the phone, so it can be shown without coverage.',
+      "Photos of the dive in the paper logbook, the dive centre's stamp or the dive computer's screen. They are also stored on the phone, so they can be shown without coverage.",
+    logbookAdd: 'Add image',
+    logbookAddMore: 'Add more images',
+    logbookMax: 'At most {n} images per dive.',
+    logbookImageOf: 'Image {n} of {total}',
     importTitle: 'Import dives',
     importHint:
       "Load dives from an import file, e.g. your dives fetched from SSI's logbook. Dives already imported are skipped.",

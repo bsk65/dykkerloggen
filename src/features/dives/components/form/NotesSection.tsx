@@ -3,6 +3,7 @@ import { Section } from '../../../../shared/ui/Section'
 import { StarRating } from '../../../../shared/ui/StarRating'
 import { TextAreaField } from '../../../../shared/ui/TextAreaField'
 import { ImageField } from '../../../../shared/ui/ImageField'
+import { LogbookImagesField } from './LogbookImagesField'
 import type { DiveImageChanges } from '../../hooks/useSaveDive'
 import type { Dive } from '../../types'
 import type { FormSectionProps } from './formTypes'
@@ -49,14 +50,11 @@ export function NotesSection({ form, set, existing, images, onImagesChange }: No
         />
       </div>
       <div className="wide">
-        <ImageField
+        <LogbookImagesField
           label={t('dives.logbookPage')}
           hint={t('dives.logbookPageHint')}
-          // Den lille version vises (findes også uden dækning).
-          existingPath={existing?.logbookPageSmallPath ?? existing?.logbookPagePath ?? null}
-          existingFullPath={existing?.logbookPagePath ?? null}
-          change={images.logbookPage}
-          onChange={(logbookPage) => onImagesChange({ ...images, logbookPage })}
+          items={images.logbook}
+          onChange={(logbook) => onImagesChange({ ...images, logbook })}
         />
       </div>
     </Section>

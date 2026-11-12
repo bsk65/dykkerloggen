@@ -1,6 +1,7 @@
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   onSnapshot,
   serverTimestamp,
@@ -12,7 +13,8 @@ import {
 import { db } from '../../firebase/config'
 import { removeOfflineFile, saveBlobOffline } from '../../shared/api/offlineFiles'
 import { deleteStorageFile, uploadImage } from '../../shared/api/storage'
-import type { Dive, DiveData } from './types'
+import { readLogbookImages } from './logic/logbookPages'
+import type { Dive, DiveData, LogbookImage } from './types'
 
 /** Brugerens dyk: users/{uid}/dives — kun brugeren selv kan læse/skrive (se firestore.rules). */
 function divesCollection(uid: string) {
@@ -25,13 +27,15 @@ function toDive(id: string, data: Record<string, unknown>): Dive {
   const rest: Record<string, unknown> = { ...data }
   delete rest.createdAt
   delete rest.updatedAt
+  // Ældre dyk har ét logbogsbillede i to felter — de læses som en liste.
+  delete rest.logbookPagePath
+  delete rest.logbookPageSmallPath
   return {
     buddies: [],
     rating: 0,
     ssiId: null,
-    logbookPagePath: null,
-    logbookPageSmallPath: null,
     ...(rest as Partial<DiveData>),
+    logbookImages: readLogbookImages(data),
     id,
   } as Dive
 }
@@ -99,15 +103,33 @@ export function updateDive(uid: string, diveId: string, data: Partial<DiveData>)
   return updateDoc(doc(divesCollection(uid), diveId), { ...data, updatedAt: serverTimestamp() })
 }
 
+/**
+ * Gemmer dykkets liste af dokumentationsbilleder. De gamle enkeltfelter
+ * fjernes samtidig, så dokumentet kun har den nye liste.
+ */
+export function setLogbookImages(
+  uid: string,
+  diveId: string,
+  images: LogbookImage[],
+): Promise<void> {
+  return updateDoc(doc(divesCollection(uid), diveId), {
+    logbookImages: images,
+    logbookPagePath: deleteField(),
+    logbookPageSmallPath: deleteField(),
+    updatedAt: serverTimestamp(),
+  })
+}
+
 /** Sletter et billede fra Storage og fra telefonen. */
 export async function deleteDiveImage(path: string): Promise<void> {
   await deleteStorageFile(path)
   await removeOfflineFile(path).catch(() => undefined)
 }
 
-/** Sletter dykket og dets billeder (dykkerstedet og logbogssiden). */
+/** Sletter dykket og alle dets billeder. */
 export async function deleteDive(uid: string, dive: Dive): Promise<void> {
-  for (const path of [dive.sitePhotoPath, dive.logbookPagePath, dive.logbookPageSmallPath]) {
+  const paths = [dive.sitePhotoPath, ...dive.logbookImages.flatMap((i) => [i.path, i.smallPath])]
+  for (const path of new Set(paths)) {
     if (path) await deleteDiveImage(path)
   }
   // Ikke afventet: sletningen sker straks på enheden og sendes, når der er forbindelse.
@@ -125,7 +147,7 @@ export async function uploadSitePhoto(uid: string, diveId: string, image: Blob):
 }
 
 /**
- * Gemmer billedet af dykket fra den gamle logbog i to størrelser: den store
+ * Gemmer et dokumentationsbillede (logbogsside, stempel …) i to størrelser: den store
  * til at zoome i og en lille, der også lægges på telefonen (kan vises uden
  * dækning). Billederne er appens egne kopier og overlever, at originalen slettes.
  */
@@ -134,8 +156,9 @@ export async function uploadLogbookPage(
   diveId: string,
   image: Blob,
   small: Blob,
-): Promise<{ path: string; smallPath: string }> {
-  const stamp = Date.now()
+): Promise<LogbookImage> {
+  // Tidsstempel + tilfældigt led: flere billeder kan gemmes i samme millisekund.
+  const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
   const path = `users/${uid}/dives/${diveId}/logbook-${stamp}.jpg`
   const smallPath = `users/${uid}/dives/${diveId}/logbook-${stamp}-small.jpg`
   await uploadImage(path, image)

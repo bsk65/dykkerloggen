@@ -1,0 +1,51 @@
+.card {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.unit {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.explain,
+.missing {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.missing {
+  margin: 0;
+}
+
+.warning {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-warning);
+  line-height: 1.4;
+}

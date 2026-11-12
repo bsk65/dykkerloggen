@@ -1,0 +1,35 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--color-surface-alt);
+  cursor: pointer;
+}
+
+.star[aria-pressed='true'] {
+  color: var(--color-star);
+}
+
+.display {
+  color: var(--color-star);
+  letter-spacing: 1px;
+}

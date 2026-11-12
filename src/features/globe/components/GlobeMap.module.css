@@ -1,0 +1,9 @@
+/* Plads til topbjælke, bundmenu og en linje tekst under kloden. */
+.map {
+  width: 100%;
+  height: calc(100vh - var(--nav-height) - 160px);
+  min-height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000814;
+}

@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Billeder (dykkersteder og logbogssider) under users/{uid}/... — kun
+    // brugeren selv. Kun billeder, højst 15 MB (appen formindsker dem før
+    // upload, så de er normalt langt under).
+    match /users/{uid}/{allPaths=**} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.contentType.matches('image/.*')
+        && request.resource.size < 15 * 1024 * 1024;
+    }
+  }
+}

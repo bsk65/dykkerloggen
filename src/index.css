@@ -1,0 +1,50 @@
+:root {
+  /* Marineblåt tema */
+  --color-bg: #0a1631;
+  --color-surface: #112452;
+  --color-surface-alt: #1b3470;
+  --color-text: #f0f4ff;
+  --color-text-muted: #9fb2d9;
+  --color-border: #233f80;
+  --color-accent: #6cb4ff;
+  --color-accent-contrast: #0a1631;
+  --color-danger: #ef4444;
+  --color-warning: #fbbf24;
+  --color-star: #fbbf24;
+
+  --nav-height: 64px;
+
+  color-scheme: dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--color-accent);
+}

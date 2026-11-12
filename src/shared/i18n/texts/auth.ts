@@ -1,0 +1,48 @@
+import { defineTexts } from '../translate'
+
+export const authTexts = defineTexts({
+  da: {
+    tagline: 'Din personlige dykkerlogbog — med kort, luftforbrug og dine gamle logbøger.',
+    login: 'Log ind',
+    signup: 'Opret bruger',
+    sendLink: 'Send link',
+    resetInfo: 'Skriv din e-mail, så sender vi et link, hvor du kan vælge en ny adgangskode.',
+    email: 'E-mail',
+    password: 'Adgangskode',
+    resetSent:
+      'Hvis der findes en bruger med {email}, er der nu sendt et link dertil. Tjek også spam-mappen.',
+    forgotPassword: 'Glemt adgangskode?',
+    toSignup: 'Ny her? Opret en bruger',
+    toLogin: 'Har du allerede en bruger? Log ind',
+    backToLogin: 'Tilbage til log ind',
+    logout: 'Log ud',
+    errorCredentials: 'Forkert e-mail eller adgangskode.',
+    errorEmailInUse: 'Der findes allerede en bruger med denne e-mail.',
+    errorWeakPassword: 'Adgangskoden skal være mindst 6 tegn.',
+    errorInvalidEmail: 'Ugyldig e-mailadresse.',
+    errorTooMany: 'For mange forsøg lige nu. Vent lidt, og prøv igen.',
+    errorGeneric: 'Der skete en fejl. Prøv igen.',
+  },
+  en: {
+    tagline: 'Your personal dive log — with maps, air consumption and your old logbooks.',
+    login: 'Log in',
+    signup: 'Create account',
+    sendLink: 'Send link',
+    resetInfo: "Enter your email and we'll send you a link where you can choose a new password.",
+    email: 'Email',
+    password: 'Password',
+    resetSent:
+      'If an account exists for {email}, a link has been sent there. Also check your spam folder.',
+    forgotPassword: 'Forgot password?',
+    toSignup: 'New here? Create an account',
+    toLogin: 'Already have an account? Log in',
+    backToLogin: 'Back to log in',
+    logout: 'Log out',
+    errorCredentials: 'Wrong email or password.',
+    errorEmailInUse: 'An account with this email already exists.',
+    errorWeakPassword: 'The password must be at least 6 characters.',
+    errorInvalidEmail: 'Invalid email address.',
+    errorTooMany: 'Too many attempts right now. Wait a moment and try again.',
+    errorGeneric: 'Something went wrong. Please try again.',
+  },
+})

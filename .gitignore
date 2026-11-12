@@ -1,0 +1,13 @@
+node_modules
+dist
+dev-dist
+*.local
+*.log
+.firebase/
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Firebase-nøgler — brug .env.example som skabelon
+.env

@@ -1,0 +1,37 @@
+.section {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.title,
+.summary {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.summary {
+  margin: 0;
+  cursor: pointer;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+details[open] > .summary {
+  margin-bottom: 14px;
+}
+
+/* To felter side om side på telefon, flere på større skærm. Brede felter
+   (kort, kommentar) bruger klassen .wide fra den, der bruger sektionen. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.grid > :global(.wide) {
+  grid-column: 1 / -1;
+}

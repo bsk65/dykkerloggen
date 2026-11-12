@@ -27,7 +27,8 @@ export function LogbookViewer({
   onDelete,
 }: LogbookViewerProps) {
   const { t } = useT()
-  const url = useStorageUrl(scan.storagePath)
+  // Den lille version vises straks (også uden dækning); den store hentes, hvis der er net.
+  const url = useStorageUrl(scan.storagePath, scan.smallPath)
   const [caption, setCaption] = useState(scan.caption)
   const [confirmDelete, setConfirmDelete] = useState(false)
 

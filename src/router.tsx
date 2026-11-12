@@ -20,6 +20,14 @@ const GlobePage = lazy(() =>
 const LogbookPage = lazy(() =>
   import('./features/logbook/components/LogbookPage').then((m) => ({ default: m.LogbookPage })),
 )
+const ProfilePage = lazy(() =>
+  import('./features/profile/components/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+)
+const CertificateFormPage = lazy(() =>
+  import('./features/profile/components/CertificateFormPage').then((m) => ({
+    default: m.CertificateFormPage,
+  })),
+)
 /* eslint-enable react-refresh/only-export-components */
 
 function page(element: ReactNode) {
@@ -42,6 +50,9 @@ export const router = createBrowserRouter([
       { path: 'dyk/:diveId/rediger', element: page(<DiveFormPage />) },
       { path: 'kloden', element: page(<GlobePage />) },
       { path: 'logboeger', element: page(<LogbookPage />) },
+      { path: 'profil', element: page(<ProfilePage />) },
+      { path: 'profil/certifikat/nyt', element: page(<CertificateFormPage />) },
+      { path: 'profil/certifikat/:certId', element: page(<CertificateFormPage />) },
     ],
   },
 ])

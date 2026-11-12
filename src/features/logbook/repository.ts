@@ -11,6 +11,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { removeOfflineFile, saveBlobOffline } from '../../shared/api/offlineFiles'
 import { deleteStorageFile, uploadImage } from '../../shared/api/storage'
 import type { LogbookScan } from './types'
 
@@ -32,6 +33,7 @@ export function subscribeToLogbookScans(
           return {
             id: d.id,
             storagePath: data.storagePath as string,
+            smallPath: (data.smallPath as string | undefined) ?? null,
             caption: (data.caption as string | undefined) ?? '',
             order: data.order as number,
           }
@@ -42,19 +44,25 @@ export function subscribeToLogbookScans(
 }
 
 /**
- * Gemmer et logbogsbillede: først selve billedet i Storage, så posten i
- * Firestore. Billedet er appens egen kopi og overlever, at originalen slettes.
+ * Gemmer et logbogsbillede i to størrelser: den store til at zoome i og en
+ * lille, der også lægges på telefonen (kan vises uden dækning). Først
+ * billederne i Storage, så posten i Firestore. Billederne er appens egne
+ * kopier og overlever, at originalen slettes.
  */
 export async function addLogbookScan(
   uid: string,
   image: Blob,
+  small: Blob,
   caption: string,
   order: number,
 ): Promise<void> {
   const ref = doc(scansCollection(uid))
   const storagePath = `users/${uid}/logbook/${ref.id}.jpg`
+  const smallPath = `users/${uid}/logbook/${ref.id}-small.jpg`
   await uploadImage(storagePath, image)
-  await setDoc(ref, { storagePath, caption, order, createdAt: serverTimestamp() })
+  await uploadImage(smallPath, small)
+  await saveBlobOffline(smallPath, small).catch(() => undefined)
+  await setDoc(ref, { storagePath, smallPath, caption, order, createdAt: serverTimestamp() })
 }
 
 export async function updateLogbookCaption(
@@ -66,6 +74,10 @@ export async function updateLogbookCaption(
 }
 
 export async function deleteLogbookScan(uid: string, scan: LogbookScan): Promise<void> {
-  await deleteStorageFile(scan.storagePath)
+  for (const path of [scan.storagePath, scan.smallPath]) {
+    if (!path) continue
+    await deleteStorageFile(path)
+    await removeOfflineFile(path).catch(() => undefined)
+  }
   await deleteDoc(doc(scansCollection(uid), scan.id))
 }

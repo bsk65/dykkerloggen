@@ -3,7 +3,8 @@ import type { LogbookScan } from '../types'
 import styles from './LogbookThumb.module.css'
 
 export function LogbookThumb({ scan, onOpen }: { scan: LogbookScan; onOpen: () => void }) {
-  const url = useStorageUrl(scan.storagePath)
+  // Miniaturen bruger den lille version — den ligger på telefonen.
+  const url = useStorageUrl(scan.smallPath ?? scan.storagePath)
   return (
     <button type="button" className={styles.thumb} onClick={onOpen}>
       {url ? (

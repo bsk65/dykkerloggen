@@ -2,14 +2,14 @@ import { useT } from '../../../../shared/i18n/useT'
 import { Section } from '../../../../shared/ui/Section'
 import { StarRating } from '../../../../shared/ui/StarRating'
 import { TextAreaField } from '../../../../shared/ui/TextAreaField'
-import type { SitePhotoChange } from '../../hooks/useSaveDive'
+import type { ImageChange } from '../../../../shared/types/imageChange'
+import { ImageField } from '../../../../shared/ui/ImageField'
 import type { FormSectionProps } from './formTypes'
-import { SitePhotoField } from './SitePhotoField'
 
 type NotesSectionProps = FormSectionProps & {
   existingPhotoPath: string | null
-  photo: SitePhotoChange
-  onPhotoChange: (change: SitePhotoChange) => void
+  photo: ImageChange
+  onPhotoChange: (change: ImageChange) => void
 }
 
 export function NotesSection({
@@ -46,7 +46,12 @@ export function NotesSection({
         />
       </div>
       <div className="wide">
-        <SitePhotoField existingPath={existingPhotoPath} change={photo} onChange={onPhotoChange} />
+        <ImageField
+          label={t('dives.sitePhoto')}
+          existingPath={existingPhotoPath}
+          change={photo}
+          onChange={onPhotoChange}
+        />
       </div>
     </Section>
   )

@@ -1,16 +1,11 @@
 import { useState } from 'react'
 import { deleteStorageFile } from '../../../shared/api/storage'
+import type { ImageChange } from '../../../shared/types/imageChange'
 import { resizeImage, SITE_PHOTO_MAX_SIZE } from '../../../shared/utils/resizeImage'
 import { useUid } from '../../auth/hooks/useUid'
 import { formToDive, type DiveForm } from '../logic/diveForm'
 import { createDive, deleteDive, updateDive, uploadSitePhoto } from '../repository'
 import type { Dive } from '../types'
-
-/**
- * Hvad der skal ske med billedet fra dykkerstedet ved gem:
- * 'keep' = uændret, 'remove' = slet det, en fil = erstat med den nye.
- */
-export type SitePhotoChange = 'keep' | 'remove' | File
 
 export function useSaveDive() {
   const uid = useUid()
@@ -21,7 +16,7 @@ export function useSaveDive() {
   async function save(
     form: DiveForm,
     existing: Dive | null,
-    photo: SitePhotoChange,
+    photo: ImageChange,
   ): Promise<string | null> {
     setSaving(true)
     setError(false)

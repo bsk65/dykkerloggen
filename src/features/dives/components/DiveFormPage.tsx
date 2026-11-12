@@ -4,7 +4,8 @@ import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
 import { useDive } from '../hooks/useDive'
 import { useDives } from '../hooks/useDives'
-import { useSaveDive, type SitePhotoChange } from '../hooks/useSaveDive'
+import type { ImageChange } from '../../../shared/types/imageChange'
+import { useSaveDive } from '../hooks/useSaveDive'
 import { diveToForm, emptyDiveForm, type DiveForm } from '../logic/diveForm'
 import { groupDivesBySite, nextDiveNumber } from '../logic/diveSites'
 import type { Dive } from '../types'
@@ -43,7 +44,7 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
   const [form, setForm] = useState<DiveForm>(() =>
     existing ? diveToForm(existing) : emptyDiveForm(nextDiveNumber(dives)),
   )
-  const [photo, setPhoto] = useState<SitePhotoChange>('keep')
+  const [photo, setPhoto] = useState<ImageChange>('keep')
   const sites = useMemo(
     () => groupDivesBySite(dives.filter((d) => d.id !== existing?.id)),
     [dives, existing],

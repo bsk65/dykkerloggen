@@ -87,9 +87,6 @@ export const divesTexts = defineTexts({
     gearDetailsPlaceholder: 'F.eks. 7 mm våddragt, handsker, hætte',
     rating: 'Bedømmelse',
     sitePhoto: 'Billede fra dykkerstedet',
-    choosePhoto: 'Vælg billede',
-    replacePhoto: 'Skift billede',
-    removePhoto: 'Fjern billede',
   },
   en: {
     logNew: 'Log a new dive',
@@ -177,8 +174,5 @@ export const divesTexts = defineTexts({
     gearDetailsPlaceholder: 'E.g. 7 mm wetsuit, gloves, hood',
     rating: 'Rating',
     sitePhoto: 'Photo from the dive site',
-    choosePhoto: 'Choose photo',
-    replacePhoto: 'Change photo',
-    removePhoto: 'Remove photo',
   },
 })

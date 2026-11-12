@@ -3,7 +3,11 @@
  * de får en høj opløsning; stedbilleder er kun til at se på.
  */
 export const LOGBOOK_MAX_SIZE = 2800
+/** Lille logbogsside til telefonen (~200-400 kB) — stadig til at læse. */
+export const LOGBOOK_SMALL_SIZE = 1600
 export const SITE_PHOTO_MAX_SIZE = 1920
+/** Certifikater — små kort, men tekst og nummer skal kunne læses. */
+export const CERTIFICATE_MAX_SIZE = 1600
 
 /** Mål, så den længste side højst er `maxSize` (aldrig forstørret). */
 export function fitWithin(

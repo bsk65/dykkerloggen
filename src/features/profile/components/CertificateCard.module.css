@@ -1,0 +1,52 @@
+.card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Kortformat som et rigtigt certifikatkort (85,6 × 54 mm). */
+.imageBox {
+  flex-shrink: 0;
+  width: 112px;
+  aspect-ratio: 85.6 / 54;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  font-size: 1.8rem;
+}
+
+.text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}

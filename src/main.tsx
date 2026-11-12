@@ -3,12 +3,15 @@ import { createRoot } from 'react-dom/client'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './index.css'
 import { App } from './App'
+import { requestPersistentStorage } from './shared/api/offlineFiles'
 import { applyStoredLang } from './shared/i18n/lang'
 import { registerServiceWorker } from './shared/pwa/registerServiceWorker'
 import { reloadOnceForStaleChunk } from './shared/utils/staleChunk'
 
 applyStoredLang()
 registerServiceWorker()
+// Offline-kopierne af certifikater og logbogssider må ikke ryddes væk af browseren.
+void requestPersistentStorage()
 
 // Vite udsender denne hændelse, når en lazy-loadet fil ikke kan hentes —
 // typisk fordi en ny version er deployet, mens den gamle stadig var åben.

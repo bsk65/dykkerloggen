@@ -22,21 +22,6 @@
   font-size: 1.1rem;
 }
 
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logout {
-  min-height: 32px;
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
 /* Plads til bundmenuen, så det nederste indhold ikke gemmer sig bag den. */
 .main {
   flex: 1;

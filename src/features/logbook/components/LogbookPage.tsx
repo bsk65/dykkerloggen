@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useOfflineCopies } from '../../../shared/hooks/useOfflineCopies'
 import { useT } from '../../../shared/i18n/useT'
+import { OfflineStatusLine } from '../../../shared/ui/OfflineStatusLine'
 import { useLogbookActions } from '../hooks/useLogbookActions'
 import { useLogbookScans } from '../hooks/useLogbookScans'
 import { LogbookThumb } from './LogbookThumb'
@@ -14,6 +16,10 @@ export function LogbookPage() {
   const actions = useLogbookActions()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const open = scans && openIndex !== null ? scans[openIndex] : null
+  // Den lille version af hver side lægges på telefonen (til dykkerture uden dækning).
+  const offline = useOfflineCopies(
+    useMemo(() => (scans ?? []).map((s) => s.smallPath ?? s.storagePath), [scans]),
+  )
 
   return (
     <div className={styles.page}>
@@ -24,6 +30,7 @@ export function LogbookPage() {
       {loadError && <p className={styles.error}>{t('logbook.loadError')}</p>}
       {loading && <p className={styles.status}>{t('common.loading')}</p>}
       {scans && scans.length === 0 && <p className={styles.status}>{t('logbook.empty')}</p>}
+      <OfflineStatusLine status={offline} />
       {scans && scans.length > 0 && (
         <ul className={styles.grid}>
           {scans.map((scan, index) => (

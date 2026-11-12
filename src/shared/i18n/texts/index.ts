@@ -5,6 +5,7 @@ import { divesTexts } from './dives'
 import { globeTexts } from './globe'
 import { logbookTexts } from './logbook'
 import { optionsTexts } from './options'
+import { profileTexts } from './profile'
 import { sitesTexts } from './sites'
 import { statsTexts } from './stats'
 
@@ -22,4 +23,5 @@ export const texts = {
   stats: statsTexts,
   globe: globeTexts,
   logbook: logbookTexts,
+  profile: profileTexts,
 }

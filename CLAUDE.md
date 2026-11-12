@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Projekt
 
-Dykkerloggen er en dansksproget PWA (DA/EN) til at logge dyk: samme felter som SSI's logbog (my.divessi.com), placering af dykkersteder på kort (inkl. "Jeg er her" via GPS), beregning af luftforbrug, en 3D-globus med alle dykkersteder og billeder af gamle papir-logbøger. Bygget efter samme standard som søsterprojektet `../Rejseappen`.
+Dykkerloggen er en dansksproget PWA (DA/EN) til at logge dyk: samme felter som SSI's logbog (my.divessi.com), placering af dykkersteder på kort (inkl. "Jeg er her" via GPS), beregning af luftforbrug, en 3D-globus med alle dykkersteder, billeder af gamle papir-logbøger og en profil med billeder af dykkercertifikater. Bygget efter samme standard som søsterprojektet `../Rejseappen`.
 
 **Stack:** React 19 + TypeScript (strict) + Vite + Firebase 12 (Auth, Firestore, Storage, Hosting) + MapLibre GL 6 (kort og globus) + vite-plugin-pwa + Vitest.
 
@@ -24,7 +24,7 @@ firebase deploy --only firestore:rules,storage   # regler
 
 ## Arkitektur og kodestandard
 
-- **Modulært pr. feature** under `src/features/`: `auth`, `dives`, `sites`, `globe`, `logbook`. Hver feature har `components/`, `hooks/`, evt. `logic/`, `types.ts`, `repository.ts`.
+- **Modulært pr. feature** under `src/features/`: `auth`, `dives`, `sites`, `globe`, `logbook`, `profile`. Hver feature har `components/`, `hooks/`, evt. `logic/`, `types.ts`, `repository.ts`.
 - **Kun `repository.ts` kalder Firestore/Storage.** Komponenter bruger hooks; hooks bruger repository-funktioner.
 - **Ren logik** (luftforbrug, statistik, steder, formular-konvertering, søgning) i `logic/` som rene funktioner med Vitest-tests (`*.test.ts` ved siden af).
 - **Fælles kode** i `src/shared/` (`ui/`, `hooks/`, `api/`, `map/`, `i18n/`, `utils/`) — kun når noget bruges af mere end én feature.
@@ -40,15 +40,19 @@ firebase deploy --only firestore:rules,storage   # regler
 | Sted                                            | Indhold                                                                                                  |
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `users/{uid}/dives/{diveId}`                    | Ét dyk (`DiveData` i `features/dives/types.ts`). Flad struktur, metriske enheder, tomme felter = `null`. |
-| `users/{uid}/logbookScans/{scanId}`             | Billede af en logbogsside (`storagePath`, `caption`, `order`).                                           |
+| `users/{uid}`                                   | Profil (`name`, `diverId`).                                                                              |
+| `users/{uid}/certificates/{certId}`             | Certifikat (`title`, `organization`, `certDate`, `certNumber`, `instructor`, `frontPath`, `backPath`).   |
+| `users/{uid}/logbookScans/{scanId}`             | Billede af en logbogsside (`storagePath`, `smallPath`, `caption`, `order`).                              |
 | Storage `users/{uid}/dives/{diveId}/site-*.jpg` | Billede fra dykkerstedet (ét pr. dyk).                                                                   |
-| Storage `users/{uid}/logbook/{scanId}.jpg`      | Logbogsbilleder.                                                                                         |
+| Storage `users/{uid}/logbook/{scanId}.jpg`      | Logbogsbilleder (fuld størrelse) + `{scanId}-small.jpg` (lille version til telefonen).                   |
+| Storage `users/{uid}/certificates/{certId}/…`   | Certifikatbilleder, `front-{ts}.jpg` / `back-{ts}.jpg`.                                                  |
 
 - Kun brugeren selv kan læse/skrive sin sti (`firestore.rules`, `storage.rules`).
 - **Valglister** (`features/dives/options.ts`) følger SSI's lister 1:1, så dyk kan importeres fra SSI senere. Vandtype står som standard på **saltvand**.
 - `source: 'app' | 'ssi'` og `ssiId` på hvert dyk er forberedt til import fra SSI (my.divessi.com har CSV/Excel-eksport på logbogssiden). Import er ikke bygget endnu.
 - Dykkersteder er ikke en egen collection — de udledes af dykkene (`groupDivesBySite`, samme navn = samme sted).
-- **Offline:** Firestore har `persistentLocalCache`. Dyk-skrivninger afventes ikke (`useSaveDive`), så et dyk kan logges ved vandet uden dækning og sendes senere. Billeder kræver forbindelse.
+- **Offline:** Firestore har `persistentLocalCache`. Dyk-skrivninger afventes ikke (`useSaveDive`), så et dyk kan logges ved vandet uden dækning og sendes senere. Upload af billeder kræver forbindelse.
+- **Billeder på telefonen (offline):** logbøgernes lille version og certifikatbillederne gemmes i Cache Storage (`dykkerloggen-offline-billeder`, nøgle = storage-sti) via `shared/api/offlineFiles.ts`. De lægges der ved upload, og `useOfflineCopies` henter manglende kopier, når Logbøger/Profil åbnes med forbindelse (status vises med `OfflineStatusLine`). `useStorageUrl` viser offline-kopien først og henter kun fra nettet, når der er forbindelse. `navigator.storage.persist()` anmodes ved opstart, så browseren ikke rydder kopierne. Gamle logbogsbilleder uden `smallPath` bruger fuld størrelse som offline-kopi.
 - Billeder formindskes i browseren før upload (`shared/utils/resizeImage.ts`) og gemmes som appens egen kopi — de overlever, at originalen slettes i Google Fotos/på telefonen.
 
 ## Ikke-indlysende

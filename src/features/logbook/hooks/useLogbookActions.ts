@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import { LOGBOOK_MAX_SIZE, resizeImage } from '../../../shared/utils/resizeImage'
+import {
+  LOGBOOK_MAX_SIZE,
+  LOGBOOK_SMALL_SIZE,
+  resizeImage,
+} from '../../../shared/utils/resizeImage'
 import { useUid } from '../../auth/hooks/useUid'
 import { addLogbookScan, deleteLogbookScan, updateLogbookCaption } from '../repository'
 import type { LogbookScan } from '../types'
@@ -23,7 +27,8 @@ export function useLogbookActions() {
     for (const [index, file] of files.entries()) {
       try {
         const image = await resizeImage(file, LOGBOOK_MAX_SIZE, 0.9)
-        await addLogbookScan(uid, image, caption, start + index)
+        const small = await resizeImage(file, LOGBOOK_SMALL_SIZE, 0.72)
+        await addLogbookScan(uid, image, small, caption, start + index)
       } catch {
         failed = true
       }

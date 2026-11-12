@@ -21,7 +21,8 @@ export function useProfile() {
     [uid],
   )
 
-  function save(next: Profile) {
+  /** Gemmer de felter, der er ændret (resten bevares). */
+  function save(next: Partial<Profile>) {
     // Gemmes straks på telefonen og sendes, når der er forbindelse.
     saveProfile(uid, next).catch(() => setError(true))
   }

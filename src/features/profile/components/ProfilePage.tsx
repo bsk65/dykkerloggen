@@ -13,6 +13,7 @@ import { certificateImagePaths } from '../logic/certificates'
 import type { Certificate } from '../types'
 import { CertificateCard } from './CertificateCard'
 import { CertificateViewer } from './CertificateViewer'
+import { GfPresetSetting } from './GfPresetSetting'
 import { ProfileHeader } from './ProfileHeader'
 import styles from './ProfilePage.module.css'
 
@@ -60,6 +61,7 @@ export function ProfilePage() {
           <span>{t('common.langLabel')}</span>
           <LangToggle />
         </div>
+        <GfPresetSetting />
         <Button type="button" variant="secondary" onClick={() => void logout()}>
           {t('auth.logout')}
         </Button>

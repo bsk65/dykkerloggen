@@ -11,6 +11,7 @@ import type { Dive } from '../types'
 import { AirConsumptionCard } from './AirConsumptionCard'
 import { DiveFacts } from './DiveFacts'
 import { LogbookPageCard } from './LogbookPageCard'
+import { NitrogenCard } from './NitrogenCard'
 import { SiteMiniMap } from './SiteMiniMap'
 import { formatDiveDate } from '../logic/formatDiveDate'
 import styles from './DiveDetailPage.module.css'
@@ -68,6 +69,7 @@ function DiveDetail({ dive }: { dive: Dive }) {
 
       <LogbookPageCard dive={dive} />
       <AirConsumptionCard dive={dive} />
+      <NitrogenCard dive={dive} />
       <DiveFacts dive={dive} />
       {dive.lat !== null && dive.lng !== null && <SiteMiniMap lat={dive.lat} lng={dive.lng} />}
       {dive.comment && <p className={styles.comment}>{dive.comment}</p>}

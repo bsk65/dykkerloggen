@@ -10,6 +10,7 @@ import {
 import { db } from '../../firebase/config'
 import { removeOfflineFile, saveBlobOffline } from '../../shared/api/offlineFiles'
 import { deleteStorageFile, uploadImage } from '../../shared/api/storage'
+import { DEFAULT_GF_PRESET, GF_PRESETS, type GfPreset } from '../dives/logic/nitrogen'
 import type { Certificate, CertificateData, Profile } from './types'
 
 function certificatesCollection(uid: string) {
@@ -28,6 +29,10 @@ export function subscribeToProfile(
       onChange({
         name: (data.name as string | undefined) ?? '',
         diverId: (data.diverId as string | undefined) ?? '',
+        gfPreset:
+          typeof data.gfPreset === 'string' && data.gfPreset in GF_PRESETS
+            ? (data.gfPreset as GfPreset)
+            : DEFAULT_GF_PRESET,
       })
     },
     onError,
@@ -35,7 +40,7 @@ export function subscribeToProfile(
 }
 
 /** Gemmer profilen (merge — andre felter på users/{uid} bevares). Afventes ikke offline. */
-export function saveProfile(uid: string, profile: Profile): Promise<void> {
+export function saveProfile(uid: string, profile: Partial<Profile>): Promise<void> {
   return setDoc(
     doc(db, 'users', uid),
     { ...profile, updatedAt: serverTimestamp() },

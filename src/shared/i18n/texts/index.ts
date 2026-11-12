@@ -3,6 +3,7 @@ import { authTexts } from './auth'
 import { commonTexts } from './common'
 import { divesTexts } from './dives'
 import { globeTexts } from './globe'
+import { nitrogenTexts } from './nitrogen'
 import { optionsTexts } from './options'
 import { profileTexts } from './profile'
 import { sitesTexts } from './sites'
@@ -19,6 +20,7 @@ export const texts = {
   options: optionsTexts,
   sites: sitesTexts,
   air: airTexts,
+  nitrogen: nitrogenTexts,
   stats: statsTexts,
   globe: globeTexts,
   profile: profileTexts,

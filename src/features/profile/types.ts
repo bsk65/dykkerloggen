@@ -1,8 +1,12 @@
+import type { GfPreset } from '../dives/logic/nitrogen'
+
 /** Brugerens profil — felter på users/{uid}. */
 export type Profile = {
   name: string
   /** SSI-nummer (eller anden organisations medlemsnummer) */
   diverId: string
+  /** Hvor forsigtigt kvælstof beregnes på dykkets side */
+  gfPreset: GfPreset
 }
 
 /**

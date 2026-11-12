@@ -1,0 +1,134 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+}
+
+.title {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.value,
+.valueWarning {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.valueWarning {
+  color: var(--color-warning);
+}
+
+.unit {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.text,
+.note,
+.explain,
+.disclaimer,
+.missing {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.note {
+  color: var(--color-warning);
+}
+
+.explain,
+.missing,
+.muted {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Søjlediagram: ét væv pr. søjle, 0–100 % af Bühlmanns grænse. */
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0;
+}
+
+.chartTitle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 120px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.barSlot {
+  flex: 1 1 0;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.bar,
+.barActive {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.barActive {
+  background: var(--color-accent);
+}
+
+.limit {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: 1px dashed var(--color-warning);
+  pointer-events: none;
+}
+
+.limitLabel {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}

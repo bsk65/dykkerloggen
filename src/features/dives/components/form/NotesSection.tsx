@@ -54,6 +54,7 @@ export function NotesSection({ form, set, existing, images, onImagesChange }: No
           hint={t('dives.logbookPageHint')}
           // Den lille version vises (findes også uden dækning).
           existingPath={existing?.logbookPageSmallPath ?? existing?.logbookPagePath ?? null}
+          existingFullPath={existing?.logbookPagePath ?? null}
           change={images.logbookPage}
           onChange={(logbookPage) => onImagesChange({ ...images, logbookPage })}
         />

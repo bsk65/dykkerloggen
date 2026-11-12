@@ -1,0 +1,27 @@
+.fill {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  padding: 0;
+  border: none;
+  background: #000;
+  cursor: zoom-out;
+}
+
+/* Billedet fylder skærmen helt ud (contain, så intet beskæres). */
+.image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100dvh;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+}
+
+/* Drejet en kvart omgang: bredde og højde byttes, så det drejede billede fylder skærmen. */
+.rotated {
+  width: 100dvh;
+  height: 100vw;
+  transform: translate(-50%, -50%) rotate(90deg);
+}

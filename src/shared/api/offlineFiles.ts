@@ -42,6 +42,20 @@ export async function isFileOffline(storagePath: string): Promise<boolean> {
   return (await cache.match(cacheKey(storagePath))) !== undefined
 }
 
+/**
+ * Billedet som blob — den gemte kopi, hvis den findes, ellers hentet fra
+ * Storage (kræver forbindelse). Bruges, når et gemt billede skal drejes.
+ */
+export async function loadImageBlob(storagePath: string): Promise<Blob> {
+  if (cacheAvailable()) {
+    const cached = await (await caches.open(CACHE_NAME)).match(cacheKey(storagePath))
+    if (cached) return cached.blob()
+  }
+  const response = await fetch(await getStorageUrl(storagePath))
+  if (!response.ok) throw new Error(`Kunne ikke hente ${storagePath}`)
+  return response.blob()
+}
+
 /** Den gemte kopi som lokal blob-URL — null, hvis den ikke er gemt. */
 export async function offlineFileUrl(storagePath: string): Promise<string | null> {
   if (!cacheAvailable()) return null

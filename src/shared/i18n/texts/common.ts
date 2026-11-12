@@ -27,6 +27,8 @@ export const commonTexts = defineTexts({
     chooseImage: 'Vælg billede',
     replaceImage: 'Skift billede',
     removeImage: 'Fjern billede',
+    rotateLeft: 'Drej billedet mod uret',
+    rotateRight: 'Drej billedet med uret',
     zoomHint: 'Tryk på billedet for at åbne det i fuld størrelse og zoome ind.',
     offlineStatus: '{saved} af {total} billeder ligger på telefonen og kan ses uden dækning.',
     offlineSync: 'Hent nu',
@@ -63,6 +65,8 @@ export const commonTexts = defineTexts({
     chooseImage: 'Choose image',
     replaceImage: 'Change image',
     removeImage: 'Remove image',
+    rotateLeft: 'Rotate the image counterclockwise',
+    rotateRight: 'Rotate the image clockwise',
     zoomHint: 'Tap the image to open it in full size and zoom in.',
     offlineStatus:
       '{saved} of {total} images are stored on this phone and can be viewed without coverage.',

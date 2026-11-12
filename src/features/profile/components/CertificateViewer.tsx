@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStorageUrl } from '../../../shared/hooks/useStorageUrl'
 import { useT } from '../../../shared/i18n/useT'
+import { Button } from '../../../shared/ui/Button'
 import { formatIsoDate } from '../../../shared/utils/dates'
 import type { Certificate } from '../types'
+import { CertificateFill } from './CertificateFill'
 import styles from './CertificateViewer.module.css'
 
 /**
- * Certifikatet i fuld skærm — til at vise frem på et dykkercenter.
- * Tryk på kortet for at vende det. Billederne ligger på telefonen, så det
- * virker også uden dækning.
+ * Certifikatet stort på skærmen — til at vise frem på et dykkercenter.
+ * Tryk på kortet for at fylde hele skærmen; knappen vender kortet. Billederne
+ * ligger på telefonen, så det virker også uden dækning.
  */
 export function CertificateViewer({
   certificate,
@@ -23,6 +25,7 @@ export function CertificateViewer({
   const [side, setSide] = useState<'front' | 'back'>(
     certificate.frontPath || !hasBack ? 'front' : 'back',
   )
+  const [filled, setFilled] = useState(false)
   const url = useStorageUrl(side === 'front' ? certificate.frontPath : certificate.backPath)
 
   useEffect(() => {
@@ -59,8 +62,8 @@ export function CertificateViewer({
       <button
         type="button"
         className={styles.imageButton}
-        onClick={() => canFlip && setSide(side === 'front' ? 'back' : 'front')}
-        disabled={!canFlip}
+        onClick={() => url && setFilled(true)}
+        disabled={!url}
       >
         {url ? (
           <img className={styles.image} src={url} alt={certificate.title} />
@@ -75,12 +78,20 @@ export function CertificateViewer({
             {line}
           </p>
         ))}
+        {url && <p className={styles.hint}>{t('profile.tapToFill')}</p>}
         {canFlip && (
-          <p className={styles.hint}>
-            {side === 'front' ? t('profile.tapForBack') : t('profile.tapForFront')}
-          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setSide(side === 'front' ? 'back' : 'front')}
+          >
+            ⇄ {side === 'front' ? t('profile.showBack') : t('profile.showFront')}
+          </Button>
         )}
       </div>
+      {filled && url && (
+        <CertificateFill url={url} alt={certificate.title} onClose={() => setFilled(false)} />
+      )}
     </div>
   )
 }

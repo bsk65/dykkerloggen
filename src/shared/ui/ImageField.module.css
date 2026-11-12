@@ -35,5 +35,12 @@
 }
 
 .actions > * {
-  flex: 1 1 140px;
+  flex: 1 1 110px;
+}
+
+/* Drej-knapperne er små ikonknapper. */
+.actions > .rotate {
+  flex: 0 0 48px;
+  padding: 0;
+  font-size: 1.3rem;
 }

@@ -27,6 +27,7 @@ export const nitrogenTexts = defineTexts({
     skipped:
       '{n} dyk inden for de foregående 48 timer kunne ikke regnes med (mangler klokkeslæt, dybde eller dyktid).',
     hours: '{h} t {m} min',
+    hoursOnly: '{h} t',
     minutes: '{m} min',
     gasAir: 'luft',
     gasNitrox: 'nitrox {o2} %',
@@ -87,6 +88,7 @@ export const nitrogenTexts = defineTexts({
     skipped:
       '{n} dive(s) within the previous 48 hours could not be included (missing time of day, depth or dive time).',
     hours: '{h} h {m} min',
+    hoursOnly: '{h} h',
     minutes: '{m} min',
     gasAir: 'air',
     gasNitrox: 'nitrox {o2} %',

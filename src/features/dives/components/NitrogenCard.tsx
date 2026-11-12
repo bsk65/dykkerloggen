@@ -18,9 +18,10 @@ import styles from './NitrogenCard.module.css'
 
 function duration(minutes: number, t: Translate): string {
   const m = Math.round(minutes)
-  return m >= 60
-    ? t('nitrogen.hours', { h: Math.floor(m / 60), m: m % 60 })
-    : t('nitrogen.minutes', { m })
+  if (m < 60) return t('nitrogen.minutes', { m })
+  return m % 60 === 0
+    ? t('nitrogen.hoursOnly', { h: m / 60 })
+    : t('nitrogen.hours', { h: Math.floor(m / 60), m: m % 60 })
 }
 
 function noDeco(minutes: number, t: Translate): string {

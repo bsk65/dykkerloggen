@@ -95,6 +95,8 @@ export function normalizeImportedDive(raw: unknown): DiveData | null {
     rating: typeof r.rating === 'number' ? Math.min(5, Math.max(0, Math.round(r.rating))) : 0,
     sitePhotoPath: null,
     logbookImages: [],
+    computerDiveId: null,
+    profile: null,
     source: r.source === 'app' ? 'app' : 'ssi',
   }
   for (const key of NUMBER_FIELDS) dive[key] = asNumber(r[key])

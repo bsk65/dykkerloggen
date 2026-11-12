@@ -14,7 +14,8 @@ import { db } from '../../firebase/config'
 import { removeOfflineFile, saveBlobOffline } from '../../shared/api/offlineFiles'
 import { deleteStorageFile, uploadImage } from '../../shared/api/storage'
 import { readLogbookImages } from './logic/logbookPages'
-import type { Dive, DiveData, LogbookImage } from './types'
+import type { ImportPlan } from './logic/uddfImport'
+import type { Dive, DiveData, DiveProfile, LogbookImage } from './types'
 
 /** Brugerens dyk: users/{uid}/dives — kun brugeren selv kan læse/skrive (se firestore.rules). */
 function divesCollection(uid: string) {
@@ -34,6 +35,8 @@ function toDive(id: string, data: Record<string, unknown>): Dive {
     buddies: [],
     rating: 0,
     ssiId: null,
+    computerDiveId: null,
+    profile: null,
     ...(rest as Partial<DiveData>),
     logbookImages: readLogbookImages(data),
     id,
@@ -81,21 +84,68 @@ export function createDive(uid: string, data: DiveData): { id: string; written: 
   return { id: ref.id, written }
 }
 
+/** Dykkets profil fra dykkercomputeren: users/{uid}/dives/{diveId}/profile/data. */
+function profileDoc(uid: string, diveId: string) {
+  return doc(divesCollection(uid), diveId, 'profile', 'data')
+}
+
 /**
- * Importerer mange dyk på én gang (højst 400 pr. skrivning). Dyk med SSI-id får
- * dokument-id'et `ssi-<id>`, så samme dyk aldrig kan ligge der to gange.
+ * Gemmer en import: nye dyk (SSI-dyk får id'et `ssi-<id>`, computerdyk
+ * `uddf-<id>`, så samme dyk aldrig kan ligge der to gange) og profiler til
+ * dyk, der allerede er logget. Skrives i bidder, så profilerne ikke gør
+ * den enkelte skrivning for stor.
  */
-export async function importDives(uid: string, dives: DiveData[]): Promise<void> {
-  for (let i = 0; i < dives.length; i += 400) {
-    const batch = writeBatch(db)
-    for (const dive of dives.slice(i, i + 400)) {
-      const ref = dive.ssiId
-        ? doc(divesCollection(uid), `ssi-${dive.ssiId}`)
+export async function saveImport(uid: string, plan: ImportPlan): Promise<void> {
+  type Write = (batch: ReturnType<typeof writeBatch>) => void
+  const writes: { weight: number; write: Write }[] = []
+  for (const { data, profile, docId } of plan.newDives) {
+    const ref = docId
+      ? doc(divesCollection(uid), docId)
+      : data.ssiId
+        ? doc(divesCollection(uid), `ssi-${data.ssiId}`)
         : doc(divesCollection(uid))
-      batch.set(ref, { ...dive, createdAt: serverTimestamp(), updatedAt: serverTimestamp() })
-    }
-    await batch.commit()
+    writes.push({
+      weight: profile ? 20 : 1,
+      write: (batch) => {
+        batch.set(ref, { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() })
+        if (profile) batch.set(profileDoc(uid, ref.id), profile)
+      },
+    })
   }
+  for (const { dive, patch, profile } of plan.links) {
+    writes.push({
+      weight: 20,
+      write: (batch) => {
+        batch.update(doc(divesCollection(uid), dive.id), { ...patch, updatedAt: serverTimestamp() })
+        batch.set(profileDoc(uid, dive.id), profile)
+      },
+    })
+  }
+  let batch = writeBatch(db)
+  let weight = 0
+  for (const w of writes) {
+    if (weight + w.weight > 400) {
+      await batch.commit()
+      batch = writeBatch(db)
+      weight = 0
+    }
+    w.write(batch)
+    weight += w.weight
+  }
+  if (weight > 0) await batch.commit()
+}
+
+export function subscribeToDiveProfile(
+  uid: string,
+  diveId: string,
+  onChange: (profile: DiveProfile | null) => void,
+  onError: (error: Error) => void,
+): Unsubscribe {
+  return onSnapshot(
+    profileDoc(uid, diveId),
+    (snap) => onChange(snap.exists() ? (snap.data() as DiveProfile) : null),
+    onError,
+  )
 }
 
 /** Ændrer et dyk. Som createDive afsluttes løftet først, når serveren har det. */
@@ -133,6 +183,7 @@ export async function deleteDive(uid: string, dive: Dive): Promise<void> {
     if (path) await deleteDiveImage(path)
   }
   // Ikke afventet: sletningen sker straks på enheden og sendes, når der er forbindelse.
+  if (dive.profile) deleteDoc(profileDoc(uid, dive.id)).catch(() => undefined)
   deleteDoc(doc(divesCollection(uid), dive.id)).catch(() => undefined)
 }
 

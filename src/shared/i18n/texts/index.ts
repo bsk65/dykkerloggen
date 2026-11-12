@@ -5,6 +5,7 @@ import { divesTexts } from './dives'
 import { globeTexts } from './globe'
 import { nitrogenTexts } from './nitrogen'
 import { optionsTexts } from './options'
+import { profileChartTexts } from './profileChart'
 import { profileTexts } from './profile'
 import { sitesTexts } from './sites'
 import { statsTexts } from './stats'
@@ -21,6 +22,7 @@ export const texts = {
   sites: sitesTexts,
   air: airTexts,
   nitrogen: nitrogenTexts,
+  profileChart: profileChartTexts,
   stats: statsTexts,
   globe: globeTexts,
   profile: profileTexts,

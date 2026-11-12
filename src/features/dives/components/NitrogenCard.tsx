@@ -6,7 +6,8 @@ import { useProfile } from '../../profile/hooks/useProfile'
 import { useDives } from '../hooks/useDives'
 import { COMPARTMENTS } from '../logic/buhlmann'
 import { DEFAULT_GF_PRESET, GF_PRESETS, SAFETY_STOP, nitrogenForDive } from '../logic/nitrogen'
-import type { Dive } from '../types'
+import { lowestComputerNdl } from '../logic/profileAnalysis'
+import type { Dive, DiveProfile } from '../types'
 import styles from './NitrogenCard.module.css'
 
 function duration(minutes: number, t: Translate): string {
@@ -21,17 +22,27 @@ function noDeco(minutes: number, t: Translate): string {
 }
 
 /**
- * Kvælstofberegning efter Bühlmann ZHL-16C for et manuelt logget dyk:
- * tid til dekogrænsen, mætningen i de 16 væv og restkvælstof fra tidligere
- * dyk. Kun til at forstå dykket bagefter.
+ * Kvælstofberegning efter Bühlmann ZHL-16C: tid til dekogrænsen, mætningen
+ * i de 16 væv og restkvælstof fra tidligere dyk. Med en profil fra
+ * dykkercomputeren regnes der på den; ellers et forsigtigt "firkantet" skøn.
+ * Kun til at forstå dykket bagefter.
  */
-export function NitrogenCard({ dive }: { dive: Dive }) {
+export function NitrogenCard({
+  dive,
+  diveProfile = null,
+}: {
+  dive: Dive
+  diveProfile?: DiveProfile | null
+}) {
   const { t, locale } = useT()
   const { dives } = useDives()
-  const { profile } = useProfile()
+  const { profile: userProfile } = useProfile()
   const [selected, setSelected] = useState<number | null>(null)
-  const gf = GF_PRESETS[profile?.gfPreset ?? DEFAULT_GF_PRESET]
-  const result = useMemo(() => nitrogenForDive(dive, dives ?? [dive], gf), [dive, dives, gf])
+  const gf = GF_PRESETS[userProfile?.gfPreset ?? DEFAULT_GF_PRESET]
+  const result = useMemo(
+    () => nitrogenForDive(dive, dives ?? [dive], gf, diveProfile),
+    [dive, dives, gf, diveProfile],
+  )
 
   if (result.status === 'missing') return <p className={styles.missing}>{t('nitrogen.missing')}</p>
   if (result.status === 'unsupported') {
@@ -49,6 +60,13 @@ export function NitrogenCard({ dive }: { dive: Dive }) {
       p: pct(result.surfaceSaturation[i]),
     })
   const shown = selected ?? result.leadingTissue
+  const fromProfile = result.basis === 'profile'
+  const computerNdl = diveProfile ? lowestComputerNdl(diveProfile) : null
+  const summary = dive.profile
+  const gasText =
+    dive.nitrox && dive.o2Percent
+      ? t('nitrogen.gasNitrox', { o2: dive.o2Percent })
+      : t('nitrogen.gasAir')
 
   return (
     <section className={styles.card}>
@@ -57,10 +75,20 @@ export function NitrogenCard({ dive }: { dive: Dive }) {
       <div className={styles.grid}>
         <div className={styles.metric}>
           <span className={result.noDecoMin === 0 ? styles.valueWarning : styles.value}>
-            {needsDeco ? duration(decoTotal, t) : noDeco(result.noDecoMin, t)}
+            {fromProfile && result.noDecoMin === 0
+              ? t('nitrogen.obligationValue', { m: result.maxCeilingM || 3 })
+              : needsDeco
+                ? duration(decoTotal, t)
+                : noDeco(result.noDecoMin, t)}
           </span>
           <span className={styles.unit}>
-            {needsDeco ? t('nitrogen.decoUnit') : t('nitrogen.noDecoUnit')}
+            {fromProfile
+              ? result.noDecoMin === 0
+                ? t('nitrogen.obligationUnit')
+                : t('nitrogen.minNdlUnit')
+              : needsDeco
+                ? t('nitrogen.decoUnit')
+                : t('nitrogen.noDecoUnit')}
           </span>
         </div>
         <div className={styles.metric}>
@@ -79,6 +107,20 @@ export function NitrogenCard({ dive }: { dive: Dive }) {
         </p>
       )}
       {needsDeco && !dive.deco && <p className={styles.note}>{t('nitrogen.loggedNoDeco')}</p>}
+      {fromProfile && summary && (summary.decoRequired || computerNdl !== null) && (
+        <p className={styles.text}>
+          {t('nitrogen.computerSays', {
+            computer: summary.computer,
+            gf:
+              summary.gfLow !== null && summary.gfHigh !== null
+                ? t('nitrogen.computerGf', { low: summary.gfLow, high: summary.gfHigh })
+                : '',
+            verdict: summary.decoRequired
+              ? t('nitrogen.computerDeco')
+              : t('nitrogen.computerNdl', { n: computerNdl ?? 0 }),
+          })}
+        </p>
+      )}
 
       <figure className={styles.chart}>
         <figcaption className={styles.chartTitle}>{t('nitrogen.chartTitle')}</figcaption>
@@ -136,21 +178,25 @@ export function NitrogenCard({ dive }: { dive: Dive }) {
       )}
 
       <p className={styles.explain}>
-        {t('nitrogen.assumptions', {
-          depth: formatNumber(dive.maxDepthM ?? 0, locale),
-          bottom: formatNumber(result.bottomMin, locale, 0),
-          stop: needsDeco
-            ? t('nitrogen.stopDeco')
-            : (dive.maxDepthM ?? 0) > SAFETY_STOP.depthM
-              ? t('nitrogen.stopSafety')
-              : t('nitrogen.stopNone'),
-          gas:
-            dive.nitrox && dive.o2Percent
-              ? t('nitrogen.gasNitrox', { o2: dive.o2Percent })
-              : t('nitrogen.gasAir'),
-          low: Math.round(gf.low * 100),
-          high: limit,
-        })}
+        {fromProfile
+          ? t('nitrogen.assumptionsProfile', {
+              n: diveProfile?.t.length ?? 0,
+              gas: gasText,
+              low: Math.round(gf.low * 100),
+              high: limit,
+            })
+          : t('nitrogen.assumptions', {
+              depth: formatNumber(dive.maxDepthM ?? 0, locale),
+              bottom: formatNumber(result.bottomMin, locale, 0),
+              stop: needsDeco
+                ? t('nitrogen.stopDeco')
+                : (dive.maxDepthM ?? 0) > SAFETY_STOP.depthM
+                  ? t('nitrogen.stopSafety')
+                  : t('nitrogen.stopNone'),
+              gas: gasText,
+              low: Math.round(gf.low * 100),
+              high: limit,
+            })}
       </p>
       <p className={styles.disclaimer}>⚠ {t('nitrogen.disclaimer')}</p>
     </section>

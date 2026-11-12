@@ -98,6 +98,8 @@ export function useSaveDive() {
           logbookImages: [],
           source: 'app',
           ssiId: null,
+          computerDiveId: null,
+          profile: null,
         })
         diveId = created.id
         created.written.catch(() => undefined)

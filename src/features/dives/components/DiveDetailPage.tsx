@@ -6,10 +6,12 @@ import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
 import { StarRating } from '../../../shared/ui/StarRating'
 import { useDive } from '../hooks/useDive'
+import { useDiveProfile } from '../hooks/useDiveProfile'
 import { useSaveDive } from '../hooks/useSaveDive'
 import type { Dive } from '../types'
 import { AirConsumptionCard } from './AirConsumptionCard'
 import { DiveFacts } from './DiveFacts'
+import { DiveProfileChart } from './DiveProfileChart'
 import { LogbookPageCard } from './LogbookPageCard'
 import { NitrogenCard } from './NitrogenCard'
 import { SiteMiniMap } from './SiteMiniMap'
@@ -30,6 +32,7 @@ function DiveDetail({ dive }: { dive: Dive }) {
   const { t, locale } = useT()
   const navigate = useNavigate()
   const photoUrl = useStorageUrl(dive.sitePhotoPath)
+  const diveProfile = useDiveProfile(dive)
   const { remove, saving, error } = useSaveDive()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
@@ -67,9 +70,12 @@ function DiveDetail({ dive }: { dive: Dive }) {
         </div>
       </div>
 
+      {diveProfile && dive.profile && (
+        <DiveProfileChart profile={diveProfile} summary={dive.profile} />
+      )}
       <LogbookPageCard dive={dive} />
       <AirConsumptionCard dive={dive} />
-      <NitrogenCard dive={dive} />
+      <NitrogenCard dive={dive} diveProfile={diveProfile} />
       <DiveFacts dive={dive} />
       {dive.lat !== null && dive.lng !== null && <SiteMiniMap lat={dive.lat} lng={dive.lng} />}
       {dive.comment && <p className={styles.comment}>{dive.comment}</p>}

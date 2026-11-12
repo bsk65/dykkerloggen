@@ -7,6 +7,8 @@ export function testDive(overrides: Partial<Dive> = {}): Dive {
     ...formToDive(emptyDiveForm(1, new Date(2026, 0, 1, 10, 0))),
     sitePhotoPath: null,
     logbookImages: [],
+    computerDiveId: null,
+    profile: null,
     source: 'app',
     ssiId: null,
     id: 'dive',

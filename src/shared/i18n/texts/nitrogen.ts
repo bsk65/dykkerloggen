@@ -37,6 +37,15 @@ export const nitrogenTexts = defineTexts({
       'Skøn: dykket regnes, som om du var på {depth} m i hele bundtiden ({bottom} min), med 18 m/min ned, 9 m/min op og {stop}. Ved havniveau, med {gas} hele dykket. Gradient factors {low}/{high} (kan ændres under Profil). Det giver for meget kvælstof hellere end for lidt.',
     disclaimer:
       'Kun til at forstå dykket bagefter — brug det aldrig til at planlægge et dyk. Følg altid din dykkercomputer og guide.',
+    minNdlUnit: 'laveste tid til dekogrænsen undervejs',
+    obligationValue: 'Stop {m} m',
+    obligationUnit: 'dekoforpligtelse undervejs',
+    computerSays: 'Computeren ({computer}{gf}): {verdict}.',
+    computerGf: ', GF {low}/{high}',
+    computerDeco: 'krævede dekostop undervejs',
+    computerNdl: 'laveste tid til dekogrænsen {n} min',
+    assumptionsProfile:
+      'Beregnet på dykkercomputerens rigtige profil ({n} målinger), ved havniveau med {gas}. Gradient factors {low}/{high} (kan ændres under Profil). Tidligere dyk regnes med som forsigtigt skøn.',
     settingLabel: 'Kvælstofberegning',
     settingHint:
       'Hvor forsigtigt dykkets kvælstof beregnes (gradient factors). Påvirker kun visningen i appen.',
@@ -80,6 +89,15 @@ export const nitrogenTexts = defineTexts({
       'Estimate: the dive is calculated as if you were at {depth} m for the whole bottom time ({bottom} min), descending at 18 m/min, ascending at 9 m/min with {stop}. At sea level, breathing {gas} throughout. Gradient factors {low}/{high} (can be changed under Profile). It errs towards too much nitrogen rather than too little.',
     disclaimer:
       'Only for understanding the dive afterwards — never use it to plan a dive. Always follow your dive computer and guide.',
+    minNdlUnit: 'lowest time to the no-deco limit during the dive',
+    obligationValue: 'Stop {m} m',
+    obligationUnit: 'deco obligation during the dive',
+    computerSays: 'The computer ({computer}{gf}): {verdict}.',
+    computerGf: ', GF {low}/{high}',
+    computerDeco: 'required deco stops during the dive',
+    computerNdl: 'lowest time to the no-deco limit {n} min',
+    assumptionsProfile:
+      "Calculated on the dive computer's real profile ({n} samples), at sea level, breathing {gas}. Gradient factors {low}/{high} (can be changed under Profile). Earlier dives are included as a cautious estimate.",
     settingLabel: 'Nitrogen calculation',
     settingHint:
       'How cautiously the nitrogen of your dives is calculated (gradient factors). Only affects what the app shows.',

@@ -4,6 +4,8 @@ import {
   BAR_PER_M,
   DESCENT_M_PER_MIN,
   SURFACE_BAR,
+  canSurface,
+  ceilingBar,
   decoAscent,
   noDecoMinutes,
   saturationPercent,
@@ -13,7 +15,7 @@ import {
   type GradientFactors,
   type Tissues,
 } from './buhlmann'
-import type { Dive } from '../types'
+import type { Dive, DiveProfile } from '../types'
 
 /** Indstillinger for, hvor forsigtigt der regnes (gradient factors). */
 export const GF_PRESETS = {
@@ -50,7 +52,11 @@ export type NitrogenResult =
   | { status: 'unsupported' }
   | {
       status: 'ok'
-      /** Antaget tid på maks. dybde */
+      /** 'profile' = beregnet på computerens rigtige profil, 'estimate' = firkantet skøn */
+      basis: 'profile' | 'estimate'
+      /** Dybeste krævede stop (m, i trin af 3 m) undervejs ifølge modellen — kun med profil */
+      maxCeilingM: number
+      /** Antaget tid på maks. dybde (kun skøn) */
       bottomMin: number
       /** Minutter til dekogrænsen ved bundtidens slut (0 = ved eller over grænsen) */
       noDecoMin: number
@@ -156,6 +162,55 @@ function simulateDive(start: Tissues, dive: DiveInput, gf: GradientFactors): Sim
   return { tissues: t, bottomMin, noDecoMin, decoStops: [] }
 }
 
+/**
+ * Den rigtige profil fra dykkercomputeren, måling for måling. Giver laveste
+ * tid til dekogrænsen undervejs og det dybeste loft (dekoforpligtelse).
+ */
+function simulateProfile(
+  start: Tissues,
+  dive: DiveInput,
+  profile: DiveProfile,
+  gf: GradientFactors,
+): { tissues: Tissues; minNoDecoMin: number; maxCeilingM: number } {
+  const barPerM = BAR_PER_M[dive.waterType === 'fresh' ? 'fresh' : 'salt']
+  const fN2At = (sec: number) => {
+    let o2 = profile.gas[0]?.o2 ?? 21
+    for (const g of profile.gas) if (g.t <= sec) o2 = g.o2
+    return 1 - o2 / 100
+  }
+  let t = start
+  let minNoDecoMin = 180
+  let maxCeilingM = 0
+  let lastCheck = -Infinity
+  const { t: times, d: depths } = profile
+  for (let i = 1; i < times.length; i++) {
+    const minutes = (times[i] - times[i - 1]) / 60
+    if (minutes <= 0) continue
+    const fN2 = fN2At(times[i - 1])
+    t = segment(t, depths[i - 1], depths[i], minutes, fN2, barPerM)
+    if (!canSurface(t, gf)) {
+      minNoDecoMin = 0
+      const ceilingM = (ceilingBar(t, gf.high) - SURFACE_BAR) / barPerM
+      maxCeilingM = Math.max(maxCeilingM, ceilingM)
+    } else if (depths[i] >= 3 && times[i] - lastCheck >= 60 && minNoDecoMin > 0) {
+      lastCheck = times[i]
+      minNoDecoMin = Math.min(
+        minNoDecoMin,
+        noDecoMinutes(t, depths[i], fN2, barPerM, gf, minNoDecoMin),
+      )
+    }
+  }
+  const last = depths[depths.length - 1]
+  if (last > 0) {
+    t = segment(t, last, 0, last / ASCENT_M_PER_MIN, fN2At(times[times.length - 1]), barPerM)
+  }
+  return {
+    tissues: t,
+    minNoDecoMin,
+    maxCeilingM: maxCeilingM > 0 ? Math.ceil(maxCeilingM / 3) * 3 : 0,
+  }
+}
+
 /** Overfladetid i luft. */
 function surfaceInterval(tissues: Tissues, minutes: number): Tissues {
   return segment(tissues, 0, 0, Math.max(0, minutes), AIR_N2, BAR_PER_M.salt)
@@ -169,6 +224,7 @@ export function nitrogenForDive(
   dive: DiveInput,
   allDives: DiveInput[],
   gf: GradientFactors,
+  profile: DiveProfile | null = null,
 ): NitrogenResult {
   const state = usable(dive)
   if (state !== 'ok') return { status: state }
@@ -217,13 +273,25 @@ export function nitrogenForDive(
 
   const rested = surfaceTissues()
   const residualPercent = Math.max(0, ...tissues.map((p, i) => ((p - rested[i]) / rested[i]) * 100))
-  const result = simulateDive(tissues, dive, gf)
-  const noDecoMinFresh =
-    previousDives > 0 ? simulateDive(rested, dive, gf).noDecoMin : result.noDecoMin
+  const run = (from: Tissues) => {
+    if (!profile || profile.t.length < 2) return { ...simulateDive(from, dive, gf), maxCeilingM: 0 }
+    const p = simulateProfile(from, dive, profile, gf)
+    return {
+      tissues: p.tissues,
+      bottomMin: 0,
+      noDecoMin: p.minNoDecoMin,
+      decoStops: [],
+      maxCeilingM: p.maxCeilingM,
+    }
+  }
+  const result = run(tissues)
+  const noDecoMinFresh = previousDives > 0 ? run(rested).noDecoMin : result.noDecoMin
   const surfaceSaturation = saturationPercent(result.tissues, SURFACE_BAR)
   const surfaceGf = Math.max(...surfaceSaturation)
   return {
     status: 'ok',
+    basis: profile && profile.t.length >= 2 ? 'profile' : 'estimate',
+    maxCeilingM: result.maxCeilingM,
     bottomMin: result.bottomMin,
     noDecoMin: result.noDecoMin,
     decoStops: result.decoStops,

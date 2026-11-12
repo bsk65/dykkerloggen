@@ -12,8 +12,11 @@ import type {
   Weather,
 } from './options'
 
-/** Hvor dykket stammer fra — 'ssi' bruges, når dyk importeres fra my.divessi.com. */
-export type DiveSource = 'app' | 'ssi'
+/**
+ * Hvor dykket stammer fra — 'ssi' bruges, når dyk importeres fra my.divessi.com,
+ * 'computer', når det er importeret fra en dykkercomputer (UDDF-fil).
+ */
+export type DiveSource = 'app' | 'ssi' | 'computer'
 
 /**
  * Et dyk, som det gemmes i Firestore (users/{uid}/dives/{diveId}).
@@ -92,6 +95,45 @@ export type DiveData = {
   source: DiveSource
   /** SSI's eget id, når dykket er importeret — så det ikke importeres to gange */
   ssiId: string | null
+  /** Dykkercomputerens id for dykket (fra UDDF-filen) — så det ikke importeres to gange */
+  computerDiveId: string | null
+  /** Oplysninger om den importerede dykkerprofil (selve profilen ligger i et underdokument) */
+  profile: ProfileSummary | null
+}
+
+/** Kort om dykkets profil fra dykkercomputeren — gemt på selve dykket. */
+export type ProfileSummary = {
+  /** F.eks. "Perdix AI" */
+  computer: string
+  samples: number
+  /** Computerens egne gradient factors i procent, hvis de står i filen */
+  gfLow: number | null
+  gfHigh: number | null
+  /** Computeren krævede dekostop undervejs */
+  decoRequired: boolean
+  /** Højeste CNS-iltbelastning i procent */
+  maxCns: number | null
+}
+
+/**
+ * Dykkerprofilen minut for minut (users/{uid}/dives/{diveId}/profile/data).
+ * Parallelle lister — én værdi pr. måling; null, hvor computeren ikke målte.
+ */
+export type DiveProfile = {
+  /** Sekunder fra dykkets start */
+  t: number[]
+  /** Dybde i meter */
+  d: number[]
+  /** Vandtemperatur i °C */
+  temp: (number | null)[]
+  /** Flasketryk i bar */
+  bar: (number | null)[]
+  /** Computerens tid til dekogrænsen i minutter */
+  ndl: (number | null)[]
+  /** Computerens krævede stopdybde (m), når der er dekoforpligtelse */
+  stop: (number | null)[]
+  /** Gasskift: fra sekund t åndes der gas med o2 % ilt */
+  gas: { t: number; o2: number }[]
 }
 
 export type Dive = DiveData & { id: string }

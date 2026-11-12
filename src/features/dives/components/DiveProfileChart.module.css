@@ -1,0 +1,189 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+}
+
+.title {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.chartRow {
+  display: flex;
+  gap: 6px;
+}
+
+/* Dybdeaksen: tal placeret efter procent af plottets højde. */
+.yAxis {
+  position: relative;
+  flex: 0 0 22px;
+  height: 200px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.yAxis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.plot {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 200px;
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--color-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  fill: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+
+.depth {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.fast {
+  fill: none;
+  stroke: var(--color-danger);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.decoBand {
+  fill: color-mix(in srgb, var(--color-warning) 30%, transparent);
+}
+
+.cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 2px solid var(--color-surface-alt);
+  border-radius: 50%;
+  background: var(--color-accent);
+  pointer-events: none;
+}
+
+.tipLeft,
+.tipRight {
+  position: absolute;
+  top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 0.75rem;
+  color: var(--color-text);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.tipRight {
+  margin-left: 10px;
+}
+
+.tipLeft {
+  transform: translateX(calc(-100% - 10px));
+}
+
+.tipWarning {
+  color: var(--color-warning);
+}
+
+.xAxis {
+  position: relative;
+  height: 14px;
+  margin-left: 28px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.xAxis span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.axisNote,
+.hint,
+.meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.axisNote {
+  text-align: center;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatchDepth,
+.swatchFast,
+.swatchDeco {
+  display: inline-block;
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+
+.swatchFast {
+  background: var(--color-danger);
+}
+
+.swatchDeco {
+  height: 10px;
+  background: color-mix(in srgb, var(--color-warning) 40%, transparent);
+}

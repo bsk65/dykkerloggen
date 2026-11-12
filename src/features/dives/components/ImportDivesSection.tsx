@@ -20,7 +20,7 @@ export function ImportDivesSection() {
       <input
         ref={inputRef}
         type="file"
-        accept="application/json,.json"
+        accept="application/json,.json,.uddf,.xml,application/xml,text/xml"
         className={styles.hiddenInput}
         onChange={(e) => {
           const file = e.target.files?.[0]
@@ -31,16 +31,33 @@ export function ImportDivesSection() {
 
       {state.step === 'ready' && (
         <div className={styles.box}>
-          <p className={styles.text}>
-            {t('dives.importFound', { found: state.found, fresh: state.fresh.length })}
-          </p>
+          <p className={styles.text}>{t('dives.importFound', { found: state.plan.found })}</p>
+          {state.plan.newDives.length > 0 && (
+            <p className={styles.text}>{t('dives.importNew', { n: state.plan.newDives.length })}</p>
+          )}
+          {state.plan.links.length > 0 && (
+            <p className={styles.text}>
+              {t('dives.importLink', {
+                dives: state.plan.links
+                  .map(({ dive }) =>
+                    t('dives.importLinkDive', { n: dive.diveNumber ?? '–', date: dive.date }),
+                  )
+                  .join(', '),
+              })}
+            </p>
+          )}
+          {state.plan.duplicates > 0 && (
+            <p className={styles.muted}>
+              {t('dives.importDuplicates', { n: state.plan.duplicates })}
+            </p>
+          )}
           <div className={styles.actions}>
             <Button type="button" variant="secondary" onClick={reset}>
               {t('common.cancel')}
             </Button>
-            {state.fresh.length > 0 && (
+            {state.plan.newDives.length + state.plan.links.length > 0 && (
               <Button type="button" onClick={() => void runImport()}>
-                {t('dives.importRun', { n: state.fresh.length })}
+                {t('dives.importRun')}
               </Button>
             )}
           </div>
@@ -49,7 +66,9 @@ export function ImportDivesSection() {
 
       {state.step === 'importing' && <p className={styles.muted}>{t('dives.importing')}</p>}
       {state.step === 'done' && (
-        <p className={styles.success}>✓ {t('dives.importDone', { n: state.count })}</p>
+        <p className={styles.success}>
+          ✓ {t('dives.importDone', { created: state.created, linked: state.linked })}
+        </p>
       )}
       {state.step === 'error' && (
         <p className={styles.error}>

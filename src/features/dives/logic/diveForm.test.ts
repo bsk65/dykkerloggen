@@ -60,6 +60,8 @@ describe('formToDive', () => {
       ...formToDive(form),
       sitePhotoPath: null,
       logbookImages: [],
+      computerDiveId: null,
+      profile: null,
       source: 'app' as const,
       ssiId: null,
     }

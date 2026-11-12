@@ -2,10 +2,12 @@ import '../../../shared/map/configureMapLibre'
 import { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { useEffect, useRef, useState } from 'react'
 import { getCurrentPosition, type PositionError } from '../../../shared/api/geolocation'
+import type { PlaceSearchResult } from '../../../shared/api/nominatim'
 import type { TextKey } from '../../../shared/i18n/translator'
 import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
 import { baseMapStyle, type BaseMap } from '../../../shared/map/mapStyles'
+import { PlaceSearch } from './PlaceSearch'
 import styles from './SitePicker.module.css'
 
 /** Hvordan punktet blev sat — GPS-punkter slås op og navngives automatisk. */
@@ -28,8 +30,8 @@ const POSITION_ERRORS: Record<PositionError, TextKey> = {
 const DEFAULT_CENTER: [number, number] = [10.5, 56]
 
 /**
- * Kort, hvor dykkerstedet sættes: tryk på kortet, træk i nålen eller brug
- * telefonens position ("Jeg er her").
+ * Kort, hvor dykkerstedet sættes: søg området frem (by, ø …), tryk på
+ * kortet, træk i nålen eller brug telefonens position ("Jeg er her").
  */
 export function SitePicker({ lat, lng, onPick }: SitePickerProps) {
   const { t } = useT()
@@ -86,6 +88,17 @@ export function SitePicker({ lat, lng, onPick }: SitePickerProps) {
     mapRef.current?.setStyle(baseMapStyle(baseMap))
   }, [baseMap])
 
+  /** Søgeresultat valgt: flyv hen til området — nålen sættes først, når man trykker på kortet. */
+  function showPlace(place: PlaceSearchResult) {
+    const map = mapRef.current
+    if (!map) return
+    if (place.bounds) {
+      map.fitBounds(place.bounds, { padding: 30, maxZoom: 15, duration: 1500 })
+    } else {
+      map.flyTo({ center: [place.lng, place.lat], zoom: 13 })
+    }
+  }
+
   async function locate() {
     setLocating(true)
     setGpsError(null)
@@ -103,6 +116,7 @@ export function SitePicker({ lat, lng, onPick }: SitePickerProps) {
 
   return (
     <div className={styles.picker}>
+      <PlaceSearch onSelect={showPlace} />
       <div ref={containerRef} className={styles.map} />
       <div className={styles.actions}>
         <Button type="button" onClick={() => void locate()} disabled={locating}>

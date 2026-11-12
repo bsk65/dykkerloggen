@@ -3,6 +3,13 @@ import { defineTexts } from '../translate'
 export const sitesTexts = defineTexts({
   da: {
     useMyPosition: 'Jeg er her',
+    searchLabel: 'Find området på kortet',
+    searchPlaceholder: 'By, ø, strand …',
+    search: 'Søg',
+    searching: 'Søger…',
+    searchNone: 'Intet sted fundet. Prøv et andet navn, eller tilføj landet.',
+    searchError: 'Søgningen virker ikke lige nu. Tjek forbindelsen.',
+    searchChosen: 'Zoom ind, og tryk på kortet præcis dér, hvor dykket var.',
     locating: 'Finder din position…',
     showSatellite: 'Vis satellit',
     showMap: 'Vis kort',
@@ -17,6 +24,13 @@ export const sitesTexts = defineTexts({
   },
   en: {
     useMyPosition: "I'm here",
+    searchLabel: 'Find the area on the map',
+    searchPlaceholder: 'Town, island, beach …',
+    search: 'Search',
+    searching: 'Searching…',
+    searchNone: 'No place found. Try another name, or add the country.',
+    searchError: 'Search is not working right now. Check your connection.',
+    searchChosen: 'Zoom in, and tap the map exactly where the dive was.',
     locating: 'Finding your position…',
     showSatellite: 'Show satellite',
     showMap: 'Show map',

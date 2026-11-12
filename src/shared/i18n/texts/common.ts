@@ -27,6 +27,11 @@ export const commonTexts = defineTexts({
     chooseImage: 'Vælg billede',
     replaceImage: 'Skift billede',
     removeImage: 'Fjern billede',
+    saveErrorImage:
+      'Billedet kunne ikke læses af telefonens browser. Prøv et andet billede, eller tag et skærmbillede af det og vælg skærmbilledet.',
+    saveErrorUpload:
+      'Billedet kunne ikke sendes til appens lager. Tjek forbindelsen, og prøv igen. Intet er gemt endnu.',
+    technicalDetail: 'Teknisk: {detail}',
     rotateLeft: 'Drej billedet mod uret',
     rotateRight: 'Drej billedet med uret',
     zoomHint: 'Tryk på billedet for at åbne det i fuld størrelse og zoome ind.',
@@ -65,6 +70,11 @@ export const commonTexts = defineTexts({
     chooseImage: 'Choose image',
     replaceImage: 'Change image',
     removeImage: 'Remove image',
+    saveErrorImage:
+      "The phone's browser could not read the image. Try another image, or take a screenshot of it and choose the screenshot.",
+    saveErrorUpload:
+      "The image could not be sent to the app's storage. Check your connection and try again. Nothing has been saved yet.",
+    technicalDetail: 'Technical: {detail}',
     rotateLeft: 'Rotate the image counterclockwise',
     rotateRight: 'Rotate the image clockwise',
     zoomHint: 'Tap the image to open it in full size and zoom in.',

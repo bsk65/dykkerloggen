@@ -37,3 +37,7 @@ export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
 })
 export const storage = getStorage(app)
+// Uden forbindelse skal en upload fejle efter et minut med en besked —
+// ikke hænge i de 10 minutter, Firebase ellers prøver igen.
+storage.maxUploadRetryTime = 60_000
+storage.maxOperationRetryTime = 60_000

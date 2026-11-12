@@ -6,6 +6,7 @@ import {
   resizeImage,
   SITE_PHOTO_MAX_SIZE,
 } from '../../../shared/utils/resizeImage'
+import { step, toSaveFailure, type SaveFailure } from '../../../shared/utils/saveFailure'
 import { useUid } from '../../auth/hooks/useUid'
 import { formToDive, type DiveForm } from '../logic/diveForm'
 import {
@@ -24,26 +25,28 @@ export type DiveImageChanges = { sitePhoto: ImageChange; logbookPage: ImageChang
 export function useSaveDive() {
   const uid = useUid()
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<SaveFailure | null>(null)
 
   async function saveSitePhoto(diveId: string, existing: Dive | null, change: ImageChange) {
     const oldPath = existing?.sitePhotoPath ?? null
     if (change instanceof File) {
-      const image = await resizeImage(change, SITE_PHOTO_MAX_SIZE)
-      const path = await uploadSitePhoto(uid, diveId, image)
+      const image = await step('image', () => resizeImage(change, SITE_PHOTO_MAX_SIZE))
+      const path = await step('upload', () => uploadSitePhoto(uid, diveId, image))
       updateDive(uid, diveId, { sitePhotoPath: path }).catch(() => undefined)
     } else if (change === 'remove') {
       updateDive(uid, diveId, { sitePhotoPath: null }).catch(() => undefined)
     }
-    if (change !== 'keep' && oldPath) await deleteDiveImage(oldPath)
+    if (change !== 'keep' && oldPath) await deleteDiveImage(oldPath).catch(() => undefined)
   }
 
   async function saveLogbookPage(diveId: string, existing: Dive | null, change: ImageChange) {
     const oldPaths = [existing?.logbookPagePath, existing?.logbookPageSmallPath]
     if (change instanceof File) {
-      const image = await resizeImage(change, LOGBOOK_MAX_SIZE, 0.9)
-      const small = await resizeImage(change, LOGBOOK_SMALL_SIZE, 0.72)
-      const { path, smallPath } = await uploadLogbookPage(uid, diveId, image, small)
+      const image = await step('image', () => resizeImage(change, LOGBOOK_MAX_SIZE, 0.9))
+      const small = await step('image', () => resizeImage(change, LOGBOOK_SMALL_SIZE, 0.72))
+      const { path, smallPath } = await step('upload', () =>
+        uploadLogbookPage(uid, diveId, image, small),
+      )
       updateDive(uid, diveId, {
         logbookPagePath: path,
         logbookPageSmallPath: smallPath,
@@ -55,7 +58,7 @@ export function useSaveDive() {
       }).catch(() => undefined)
     }
     if (change === 'keep') return
-    for (const path of oldPaths) if (path) await deleteDiveImage(path)
+    for (const path of oldPaths) if (path) await deleteDiveImage(path).catch(() => undefined)
   }
 
   /** Gemmer dykket og returnerer dets id — eller null ved fejl. */
@@ -65,7 +68,7 @@ export function useSaveDive() {
     images: DiveImageChanges,
   ): Promise<string | null> {
     setSaving(true)
-    setError(false)
+    setError(null)
     try {
       const data = formToDive(form)
       // Firestore-skrivningerne afventes ikke: de gemmes straks på enheden
@@ -90,8 +93,9 @@ export function useSaveDive() {
       await saveSitePhoto(diveId, existing, images.sitePhoto)
       await saveLogbookPage(diveId, existing, images.logbookPage)
       return diveId
-    } catch {
-      setError(true)
+    } catch (err) {
+      console.error('Dykket kunne ikke gemmes', err)
+      setError(toSaveFailure(err))
       return null
     } finally {
       setSaving(false)
@@ -100,12 +104,12 @@ export function useSaveDive() {
 
   async function remove(dive: Dive): Promise<boolean> {
     setSaving(true)
-    setError(false)
+    setError(null)
     try {
       await deleteDive(uid, dive)
       return true
-    } catch {
-      setError(true)
+    } catch (err) {
+      setError(toSaveFailure(err))
       return false
     } finally {
       setSaving(false)

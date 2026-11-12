@@ -4,6 +4,7 @@ import { useT } from '../../../shared/i18n/useT'
 import type { ImageChange } from '../../../shared/types/imageChange'
 import { Button } from '../../../shared/ui/Button'
 import { ImageField } from '../../../shared/ui/ImageField'
+import { SaveFailureMessage } from '../../../shared/ui/SaveFailureMessage'
 import { TextField } from '../../../shared/ui/TextField'
 import { useCertificateActions } from '../hooks/useCertificateActions'
 import { useCertificates } from '../hooks/useCertificates'
@@ -109,7 +110,7 @@ function CertificateForm({ existing }: { existing: Certificate | null }) {
         change={back}
         onChange={setBack}
       />
-      {error && <p className={styles.error}>{t('profile.saveError')}</p>}
+      {error && <SaveFailureMessage failure={error} saveMessage="profile.saveError" />}
       <div className={styles.actions}>
         <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
           {t('common.cancel')}

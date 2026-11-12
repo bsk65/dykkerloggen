@@ -1,3 +1,5 @@
+import { canvasToJpeg, decodeImage } from './decodeImage'
+
 /**
  * Største side i pixels. Logbogssider skal kunne læses, også håndskrift, så
  * de får en høj opløsning; stedbilleder er kun til at se på.
@@ -22,23 +24,17 @@ export function fitWithin(
 /**
  * Formindsker et billede til JPEG, før det gemmes — et telefonbillede på
  * 5-10 MB bliver typisk under 1 MB, så lagerpladsen holder længe gratis.
- * Billedets EXIF-retning følges (createImageBitmap gør det selv).
+ * Billedets EXIF-retning følges (se decodeImage).
  */
 export async function resizeImage(file: Blob, maxSize: number, quality = 0.85): Promise<Blob> {
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
-  const { width, height } = fitWithin(bitmap.width, bitmap.height, maxSize)
+  const image = await decodeImage(file)
+  const { width, height } = fitWithin(image.width, image.height, maxSize)
   const canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height
   const context = canvas.getContext('2d')
   if (!context) throw new Error('Kunne ikke behandle billedet')
-  context.drawImage(bitmap, 0, 0, width, height)
-  bitmap.close()
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error('Kunne ikke behandle billedet'))),
-      'image/jpeg',
-      quality,
-    )
-  })
+  context.drawImage(image.source, 0, 0, width, height)
+  image.close()
+  return canvasToJpeg(canvas, quality)
 }

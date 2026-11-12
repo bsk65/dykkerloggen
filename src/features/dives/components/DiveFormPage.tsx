@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
+import { SaveFailureMessage } from '../../../shared/ui/SaveFailureMessage'
 import { useDive } from '../hooks/useDive'
 import { useDives } from '../hooks/useDives'
 import { useSaveDive, type DiveImageChanges } from '../hooks/useSaveDive'
@@ -78,7 +79,7 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
         images={images}
         onImagesChange={setImages}
       />
-      {error && <p className={styles.error}>{t('dives.saveError')}</p>}
+      {error && <SaveFailureMessage failure={error} saveMessage="dives.saveError" />}
       <div className={styles.actions}>
         <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
           {t('common.cancel')}

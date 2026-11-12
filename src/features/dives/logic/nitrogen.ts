@@ -32,6 +32,11 @@ export const SAFETY_STOP = { depthM: 5, minutes: 3 }
 /** Dyk, der sluttede mere end så længe før, regnes ikke med (kvælstoffet er væk). */
 const REPETITIVE_WINDOW_MIN = 48 * 60
 
+/** Tidspunkter efter dykket (timer), hvor restkvælstoffet vises. */
+export const AFTER_DIVE_HOURS = [0, 1, 2, 4, 6, 12, 24] as const
+/** "Næsten normalt": under så mange procent mere kvælstof end hos en, der har været på land længe. */
+export const NEAR_NORMAL_PERCENT = 5
+
 type DiveInput = Pick<
   Dive,
   | 'id'
@@ -73,6 +78,10 @@ export type NitrogenResult =
        * mest belastede væv havde end hos en, der har været på land længe.
        */
       residualPercent: number
+      /** Restkvælstof (samme mål som residualPercent) på tidspunkter efter dykket, uden nye dyk */
+      afterDive: { hours: number; residualPercent: number }[]
+      /** Minutter efter dykket, til restkvælstoffet er under NEAR_NORMAL_PERCENT (null = over 48 t) */
+      nearNormalMin: number | null
       /** Minutter til dekogrænsen, hvis der ikke havde været tidligere dyk */
       noDecoMinFresh: number
       /** Tidligere dyk, der er regnet med */
@@ -216,6 +225,33 @@ function surfaceInterval(tissues: Tissues, minutes: number): Tissues {
   return segment(tissues, 0, 0, Math.max(0, minutes), AIR_N2, BAR_PER_M.salt)
 }
 
+/** Hvor mange procent mere kvælstof det mest belastede væv har end hos en, der har været på land længe. */
+function residualPercentOf(tissues: Tissues): number {
+  const rested = surfaceTissues()
+  return Math.max(0, ...tissues.map((p, i) => ((p - rested[i]) / rested[i]) * 100))
+}
+
+/**
+ * Hvordan restkvælstoffet falder i overfladen efter dykket (hvis man ikke
+ * dykker igen) — Bühlmanns svar på tabellernes "gentagelsesgruppe".
+ */
+export function afterDiveDesaturation(tissues: Tissues): {
+  afterDive: { hours: number; residualPercent: number }[]
+  nearNormalMin: number | null
+} {
+  const afterDive = AFTER_DIVE_HOURS.map((hours) => ({
+    hours,
+    residualPercent: residualPercentOf(surfaceInterval(tissues, hours * 60)),
+  }))
+  // Skridt på 10 min er rigeligt præcist til en visning i timer og minutter.
+  let t = tissues
+  for (let minutes = 0; minutes <= REPETITIVE_WINDOW_MIN; minutes += 10) {
+    if (residualPercentOf(t) < NEAR_NORMAL_PERCENT) return { afterDive, nearNormalMin: minutes }
+    t = surfaceInterval(t, 10)
+  }
+  return { afterDive, nearNormalMin: null }
+}
+
 /**
  * Kvælstofberegning for ét dyk — med restkvælstof fra dyk inden for de
  * foregående 48 timer, når klokkeslættene er kendt.
@@ -272,7 +308,7 @@ export function nitrogenForDive(
   }
 
   const rested = surfaceTissues()
-  const residualPercent = Math.max(0, ...tissues.map((p, i) => ((p - rested[i]) / rested[i]) * 100))
+  const residualPercent = residualPercentOf(tissues)
   const run = (from: Tissues) => {
     if (!profile || profile.t.length < 2) return { ...simulateDive(from, dive, gf), maxCeilingM: 0 }
     const p = simulateProfile(from, dive, profile, gf)
@@ -299,6 +335,7 @@ export function nitrogenForDive(
     surfaceGf,
     leadingTissue: surfaceSaturation.indexOf(surfaceGf),
     residualPercent,
+    ...afterDiveDesaturation(result.tissues),
     noDecoMinFresh,
     previousDives,
     surfaceIntervalMin,

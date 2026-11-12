@@ -132,3 +132,38 @@
   font-size: 0.7rem;
   color: var(--color-text-muted);
 }
+
+/* Restkvælstof efter dykket: én celle pr. tidspunkt. */
+.after {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.afterRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+}
+
+.afterCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px;
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.afterHour {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.afterValue {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}

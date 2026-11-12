@@ -43,6 +43,28 @@ describe('nitrogenForDive', () => {
     expect(r.previousDives).toBe(0)
   })
 
+  it('residual nitrogen falls after the dive and reaches near-normal', () => {
+    const d = dive('a', '2026-03-01', '10:00', 18, 45)
+    const r = nitrogenForDive(d, [d], gf)
+    if (r.status !== 'ok') throw new Error(r.status)
+    const values = r.afterDive.map((p) => p.residualPercent)
+    expect(r.afterDive.map((p) => p.hours)).toEqual([0, 1, 2, 4, 6, 12, 24])
+    expect(values[0]).toBeGreaterThan(50)
+    values.slice(1).forEach((v, i) => expect(v).toBeLessThan(values[i]))
+    expect(r.nearNormalMin).not.toBeNull()
+    expect(r.nearNormalMin!).toBeGreaterThan(4 * 60)
+    expect(r.nearNormalMin!).toBeLessThan(24 * 60)
+  })
+
+  it('a deeper, longer dive takes longer to get back to normal', () => {
+    const short = dive('a', '2026-03-01', '10:00', 12, 30)
+    const long = dive('b', '2026-03-01', '10:00', 30, 50)
+    const a = nitrogenForDive(short, [short], gf)
+    const b = nitrogenForDive(long, [long], gf)
+    if (a.status !== 'ok' || b.status !== 'ok') throw new Error()
+    expect(b.nearNormalMin!).toBeGreaterThan(a.nearNormalMin!)
+  })
+
   it('a long deep dive needs deco', () => {
     const d = dive('a', '2026-03-01', '10:00', 40, 45)
     const r = nitrogenForDive(d, [d], gf)

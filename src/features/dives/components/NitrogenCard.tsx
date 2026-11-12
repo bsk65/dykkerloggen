@@ -5,7 +5,13 @@ import { formatNumber } from '../../../shared/utils/numbers'
 import { useProfile } from '../../profile/hooks/useProfile'
 import { useDives } from '../hooks/useDives'
 import { COMPARTMENTS } from '../logic/buhlmann'
-import { DEFAULT_GF_PRESET, GF_PRESETS, SAFETY_STOP, nitrogenForDive } from '../logic/nitrogen'
+import {
+  DEFAULT_GF_PRESET,
+  GF_PRESETS,
+  NEAR_NORMAL_PERCENT,
+  SAFETY_STOP,
+  nitrogenForDive,
+} from '../logic/nitrogen'
 import { lowestComputerNdl } from '../logic/profileAnalysis'
 import type { Dive, DiveProfile } from '../types'
 import styles from './NitrogenCard.module.css'
@@ -173,6 +179,31 @@ export function NitrogenCard({
             : t('nitrogen.repetitiveFreshDeco')}
         </p>
       )}
+      <div className={styles.after}>
+        <p className={styles.chartTitle}>{t('nitrogen.afterTitle')}</p>
+        <p className={styles.text}>
+          {result.nearNormalMin === null
+            ? t('nitrogen.nearNormalLong', { p: NEAR_NORMAL_PERCENT })
+            : t('nitrogen.nearNormal', {
+                time: duration(Math.ceil(result.nearNormalMin / 30) * 30, t),
+                p: NEAR_NORMAL_PERCENT,
+              })}
+        </p>
+        <dl className={styles.afterRow}>
+          {result.afterDive.map((point) => (
+            <div key={point.hours} className={styles.afterCell}>
+              <dt className={styles.afterHour}>
+                {point.hours === 0
+                  ? t('nitrogen.afterNow')
+                  : t('nitrogen.afterHours', { h: point.hours })}
+              </dt>
+              <dd className={styles.afterValue}>+{pct(point.residualPercent)} %</dd>
+            </div>
+          ))}
+        </dl>
+        <p className={styles.explain}>{t('nitrogen.afterExplain')}</p>
+      </div>
+
       {result.skippedDives > 0 && (
         <p className={styles.note}>{t('nitrogen.skipped', { n: result.skippedDives })}</p>
       )}

@@ -52,6 +52,14 @@ export const nitrogenTexts = defineTexts({
     preset_conservative: 'Forsigtig (30/70)',
     preset_standard: 'Mellem (40/85)',
     preset_liberal: 'Mindre forsigtig (50/90)',
+    afterTitle: 'Restkvælstof efter dykket',
+    nearNormal:
+      'Næsten normalt igen (under {p} % ekstra) efter ca. {time}, hvis du ikke dykker igen.',
+    nearNormalLong: 'Over 48 timer, før du er næsten normal igen (under {p} % ekstra).',
+    afterNow: 'Op',
+    afterHours: '{h} t',
+    afterExplain:
+      'Bühlmann giver ikke et bogstav (som PADI-tabellens gentagelsesgruppe), men følger kvælstoffet i alle 16 væv hele tiden. Tallene er, hvor meget mere kvælstof det mest belastede væv har end hos en, der har været på land længe.',
   },
   en: {
     title: 'Nitrogen (Bühlmann ZHL-16C)',
@@ -104,5 +112,13 @@ export const nitrogenTexts = defineTexts({
     preset_conservative: 'Conservative (30/70)',
     preset_standard: 'Medium (40/85)',
     preset_liberal: 'Less conservative (50/90)',
+    afterTitle: 'Residual nitrogen after the dive',
+    nearNormal:
+      'Almost back to normal (under {p} % extra) after about {time}, if you do not dive again.',
+    nearNormalLong: 'More than 48 hours before you are almost back to normal (under {p} % extra).',
+    afterNow: 'Out',
+    afterHours: '{h} h',
+    afterExplain:
+      'Bühlmann does not give a letter (like the pressure group in the PADI table) but tracks the nitrogen in all 16 tissues all the time. The figures show how much more nitrogen the most loaded tissue holds than in someone who has been ashore for a long time.',
   },
 })

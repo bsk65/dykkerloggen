@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import type { TextKey } from '../i18n/translator'
 import { useT } from '../i18n/useT'
+import { AppQrButton } from './AppQrButton'
 import styles from './AppShell.module.css'
 
 const TABS: { to: string; label: TextKey; icon: string; end?: boolean }[] = [
@@ -11,7 +12,7 @@ const TABS: { to: string; label: TextKey; icon: string; end?: boolean }[] = [
 ]
 
 /**
- * Topbjælke + indhold + fast bundmenu (nem at ramme med tommelfingeren).
+ * Topbjælke (navn + logo med QR-kode) + indhold + fast bundmenu (nem at ramme med tommelfingeren).
  * Sprogvalg og log ud ligger på profilsiden.
  */
 export function AppShell() {
@@ -21,6 +22,7 @@ export function AppShell() {
     <div className={styles.shell}>
       <header className={styles.header}>
         <span className={styles.brand}>{t('common.appName')}</span>
+        <AppQrButton />
       </header>
       <main className={styles.main}>
         <Outlet />

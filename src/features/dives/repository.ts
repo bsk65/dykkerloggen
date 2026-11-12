@@ -10,6 +10,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore'
 import { db } from '../../firebase/config'
+import { removeOfflineFile, saveBlobOffline } from '../../shared/api/offlineFiles'
 import { deleteStorageFile, uploadImage } from '../../shared/api/storage'
 import type { Dive, DiveData } from './types'
 
@@ -24,7 +25,15 @@ function toDive(id: string, data: Record<string, unknown>): Dive {
   const rest: Record<string, unknown> = { ...data }
   delete rest.createdAt
   delete rest.updatedAt
-  return { buddies: [], rating: 0, ssiId: null, ...(rest as Partial<DiveData>), id } as Dive
+  return {
+    buddies: [],
+    rating: 0,
+    ssiId: null,
+    logbookPagePath: null,
+    logbookPageSmallPath: null,
+    ...(rest as Partial<DiveData>),
+    id,
+  } as Dive
 }
 
 export function subscribeToDives(
@@ -90,9 +99,17 @@ export function updateDive(uid: string, diveId: string, data: Partial<DiveData>)
   return updateDoc(doc(divesCollection(uid), diveId), { ...data, updatedAt: serverTimestamp() })
 }
 
-/** Sletter dykket og dets billede fra dykkerstedet. */
+/** Sletter et billede fra Storage og fra telefonen. */
+export async function deleteDiveImage(path: string): Promise<void> {
+  await deleteStorageFile(path)
+  await removeOfflineFile(path).catch(() => undefined)
+}
+
+/** Sletter dykket og dets billeder (dykkerstedet og logbogssiden). */
 export async function deleteDive(uid: string, dive: Dive): Promise<void> {
-  if (dive.sitePhotoPath) await deleteStorageFile(dive.sitePhotoPath)
+  for (const path of [dive.sitePhotoPath, dive.logbookPagePath, dive.logbookPageSmallPath]) {
+    if (path) await deleteDiveImage(path)
+  }
   // Ikke afventet: sletningen sker straks på enheden og sendes, når der er forbindelse.
   deleteDoc(doc(divesCollection(uid), dive.id)).catch(() => undefined)
 }
@@ -105,4 +122,24 @@ export async function uploadSitePhoto(uid: string, diveId: string, image: Blob):
   const path = `users/${uid}/dives/${diveId}/site-${Date.now()}.jpg`
   await uploadImage(path, image)
   return path
+}
+
+/**
+ * Gemmer billedet af dykket fra den gamle logbog i to størrelser: den store
+ * til at zoome i og en lille, der også lægges på telefonen (kan vises uden
+ * dækning). Billederne er appens egne kopier og overlever, at originalen slettes.
+ */
+export async function uploadLogbookPage(
+  uid: string,
+  diveId: string,
+  image: Blob,
+  small: Blob,
+): Promise<{ path: string; smallPath: string }> {
+  const stamp = Date.now()
+  const path = `users/${uid}/dives/${diveId}/logbook-${stamp}.jpg`
+  const smallPath = `users/${uid}/dives/${diveId}/logbook-${stamp}-small.jpg`
+  await uploadImage(path, image)
+  await uploadImage(smallPath, small)
+  await saveBlobOffline(smallPath, small).catch(() => undefined)
+  return { path, smallPath }
 }

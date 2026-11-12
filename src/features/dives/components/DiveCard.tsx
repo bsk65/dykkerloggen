@@ -27,7 +27,14 @@ export function DiveCard({ dive }: { dive: Dive }) {
           {formatDiveDate(dive, locale)}
           {dive.country && ` · ${dive.country}`}
         </span>
-        <StarRating value={dive.rating} />
+        <span className={styles.badges}>
+          <StarRating value={dive.rating} />
+          {dive.logbookPagePath && (
+            <span className={styles.logbookIcon} title={t('dives.logbookPage')}>
+              📖
+            </span>
+          )}
+        </span>
       </div>
       <div className={styles.figures}>
         {dive.maxDepthM !== null && <span>{formatNumber(dive.maxDepthM, locale)} m</span>}

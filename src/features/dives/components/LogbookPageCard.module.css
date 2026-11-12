@@ -1,0 +1,36 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.thumbButton {
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-surface-alt);
+  cursor: zoom-in;
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.placeholder {
+  display: block;
+  padding: 40px 0;
+  color: var(--color-text-muted);
+}

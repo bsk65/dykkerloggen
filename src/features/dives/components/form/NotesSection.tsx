@@ -2,23 +2,18 @@ import { useT } from '../../../../shared/i18n/useT'
 import { Section } from '../../../../shared/ui/Section'
 import { StarRating } from '../../../../shared/ui/StarRating'
 import { TextAreaField } from '../../../../shared/ui/TextAreaField'
-import type { ImageChange } from '../../../../shared/types/imageChange'
 import { ImageField } from '../../../../shared/ui/ImageField'
+import type { DiveImageChanges } from '../../hooks/useSaveDive'
+import type { Dive } from '../../types'
 import type { FormSectionProps } from './formTypes'
 
 type NotesSectionProps = FormSectionProps & {
-  existingPhotoPath: string | null
-  photo: ImageChange
-  onPhotoChange: (change: ImageChange) => void
+  existing: Dive | null
+  images: DiveImageChanges
+  onImagesChange: (images: DiveImageChanges) => void
 }
 
-export function NotesSection({
-  form,
-  set,
-  existingPhotoPath,
-  photo,
-  onPhotoChange,
-}: NotesSectionProps) {
+export function NotesSection({ form, set, existing, images, onImagesChange }: NotesSectionProps) {
   const { t } = useT()
   return (
     <Section title={t('dives.sectionNotes')}>
@@ -48,9 +43,19 @@ export function NotesSection({
       <div className="wide">
         <ImageField
           label={t('dives.sitePhoto')}
-          existingPath={existingPhotoPath}
-          change={photo}
-          onChange={onPhotoChange}
+          existingPath={existing?.sitePhotoPath ?? null}
+          change={images.sitePhoto}
+          onChange={(sitePhoto) => onImagesChange({ ...images, sitePhoto })}
+        />
+      </div>
+      <div className="wide">
+        <ImageField
+          label={t('dives.logbookPage')}
+          hint={t('dives.logbookPageHint')}
+          // Den lille version vises (findes også uden dækning).
+          existingPath={existing?.logbookPageSmallPath ?? existing?.logbookPagePath ?? null}
+          change={images.logbookPage}
+          onChange={(logbookPage) => onImagesChange({ ...images, logbookPage })}
         />
       </div>
     </Section>

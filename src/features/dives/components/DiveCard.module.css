@@ -38,6 +38,16 @@
   color: var(--color-text-muted);
 }
 
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logbookIcon {
+  font-size: 0.9rem;
+}
+
 .meta {
   font-size: 0.8rem;
   color: var(--color-text-muted);

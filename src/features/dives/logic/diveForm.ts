@@ -209,9 +209,14 @@ export function parseBuddies(textValue: string): string[] {
 /**
  * Formularen til data, der kan gemmes. Felter, der ikke er relevante
  * (dekogas uden dekodyk, nitrox-% uden nitrox), gemmes som tomme.
- * Billedet og kilden røres ikke her — de sættes af den, der gemmer.
+ * Billederne og kilden røres ikke her — de sættes af den, der gemmer.
  */
-export function formToDive(form: DiveForm): Omit<DiveData, 'sitePhotoPath' | 'source' | 'ssiId'> {
+export type DiveFormData = Omit<
+  DiveData,
+  'sitePhotoPath' | 'logbookPagePath' | 'logbookPageSmallPath' | 'source' | 'ssiId'
+>
+
+export function formToDive(form: DiveForm): DiveFormData {
   const decoGas = form.deco && form.decoGasUsed
   return {
     diveNumber: parseNumber(form.diveNumber),

@@ -8,6 +8,8 @@ import styles from './ImageField.module.css'
 
 type ImageFieldProps = {
   label: string
+  /** Kort forklaring under overskriften */
+  hint?: string
   existingPath: string | null
   change: ImageChange
   onChange: (change: ImageChange) => void
@@ -17,7 +19,7 @@ type ImageFieldProps = {
  * Ét billede med forhåndsvisning. Vælges fra telefonen — på Android kan man
  * i vælgeren også hente direkte fra Google Fotos. Billedet kopieres til appen.
  */
-export function ImageField({ label, existingPath, change, onChange }: ImageFieldProps) {
+export function ImageField({ label, hint, existingPath, change, onChange }: ImageFieldProps) {
   const { t } = useT()
   const inputRef = useRef<HTMLInputElement>(null)
   const newFile = change instanceof File ? change : null
@@ -29,6 +31,7 @@ export function ImageField({ label, existingPath, change, onChange }: ImageField
   return (
     <div className={styles.field}>
       <span className={styles.label}>{label}</span>
+      {hint && <span className={styles.hint}>{hint}</span>}
       {shownUrl && <img className={styles.preview} src={shownUrl} alt={label} />}
       <input
         ref={inputRef}

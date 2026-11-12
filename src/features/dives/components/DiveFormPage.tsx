@@ -4,8 +4,7 @@ import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
 import { useDive } from '../hooks/useDive'
 import { useDives } from '../hooks/useDives'
-import type { ImageChange } from '../../../shared/types/imageChange'
-import { useSaveDive } from '../hooks/useSaveDive'
+import { useSaveDive, type DiveImageChanges } from '../hooks/useSaveDive'
 import { diveToForm, emptyDiveForm, type DiveForm } from '../logic/diveForm'
 import { groupDivesBySite, nextDiveNumber } from '../logic/diveSites'
 import type { Dive } from '../types'
@@ -44,7 +43,10 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
   const [form, setForm] = useState<DiveForm>(() =>
     existing ? diveToForm(existing) : emptyDiveForm(nextDiveNumber(dives)),
   )
-  const [photo, setPhoto] = useState<ImageChange>('keep')
+  const [images, setImages] = useState<DiveImageChanges>({
+    sitePhoto: 'keep',
+    logbookPage: 'keep',
+  })
   const sites = useMemo(
     () => groupDivesBySite(dives.filter((d) => d.id !== existing?.id)),
     [dives, existing],
@@ -56,7 +58,7 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    const id = await save(form, existing, photo)
+    const id = await save(form, existing, images)
     if (id) navigate(`/dyk/${id}`, { replace: true })
   }
 
@@ -72,9 +74,9 @@ function DiveFormLoaded({ dives, existing }: LoadedProps) {
       <NotesSection
         form={form}
         set={set}
-        existingPhotoPath={existing?.sitePhotoPath ?? null}
-        photo={photo}
-        onPhotoChange={setPhoto}
+        existing={existing}
+        images={images}
+        onImagesChange={setImages}
       />
       {error && <p className={styles.error}>{t('dives.saveError')}</p>}
       <div className={styles.actions}>

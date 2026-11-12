@@ -10,6 +10,7 @@ import { useSaveDive } from '../hooks/useSaveDive'
 import type { Dive } from '../types'
 import { AirConsumptionCard } from './AirConsumptionCard'
 import { DiveFacts } from './DiveFacts'
+import { LogbookPageCard } from './LogbookPageCard'
 import { SiteMiniMap } from './SiteMiniMap'
 import { formatDiveDate } from '../logic/formatDiveDate'
 import styles from './DiveDetailPage.module.css'
@@ -65,6 +66,7 @@ function DiveDetail({ dive }: { dive: Dive }) {
         </div>
       </div>
 
+      <LogbookPageCard dive={dive} />
       <AirConsumptionCard dive={dive} />
       <DiveFacts dive={dive} />
       {dive.lat !== null && dive.lng !== null && <SiteMiniMap lat={dive.lat} lng={dive.lng} />}

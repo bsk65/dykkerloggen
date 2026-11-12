@@ -94,6 +94,8 @@ export function normalizeImportedDive(raw: unknown): DiveData | null {
     buddies: Array.isArray(r.buddies) ? r.buddies.map(asText).filter((b) => b !== null) : [],
     rating: typeof r.rating === 'number' ? Math.min(5, Math.max(0, Math.round(r.rating))) : 0,
     sitePhotoPath: null,
+    logbookPagePath: null,
+    logbookPageSmallPath: null,
     source: r.source === 'app' ? 'app' : 'ssi',
   }
   for (const key of NUMBER_FIELDS) dive[key] = asNumber(r[key])

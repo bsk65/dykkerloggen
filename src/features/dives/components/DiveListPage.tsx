@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useOfflineCopies } from '../../../shared/hooks/useOfflineCopies'
 import { useT } from '../../../shared/i18n/useT'
+import { OfflineStatusLine } from '../../../shared/ui/OfflineStatusLine'
 import { TextField } from '../../../shared/ui/TextField'
 import { useDives } from '../hooks/useDives'
 import { filterDives } from '../logic/filterDives'
+import { logbookPagePaths } from '../logic/logbookPages'
 import { DiveCard } from './DiveCard'
 import { StatsSummary } from './StatsSummary'
 import styles from './DiveListPage.module.css'
@@ -14,6 +17,8 @@ export function DiveListPage() {
   const { dives, loading, error } = useDives()
   const [query, setQuery] = useState('')
   const shown = useMemo(() => filterDives(dives ?? [], query), [dives, query])
+  // Logbogssiderne (lille version) skal ligge på telefonen — dokumentation uden dækning.
+  const offline = useOfflineCopies(useMemo(() => logbookPagePaths(dives ?? []), [dives]))
 
   return (
     <div className={styles.page}>
@@ -26,6 +31,7 @@ export function DiveListPage() {
       {dives && dives.length > 0 && (
         <>
           <StatsSummary dives={dives} />
+          <OfflineStatusLine status={offline} />
           <TextField
             label={t('dives.search')}
             type="search"

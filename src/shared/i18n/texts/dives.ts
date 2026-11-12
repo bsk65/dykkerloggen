@@ -9,6 +9,9 @@ export const divesTexts = defineTexts({
     loadError: 'Kunne ikke hente dine dyk. Tjek forbindelsen.',
     saveError: 'Dykket kunne ikke gemmes. Tjek forbindelsen, og prøv igen.',
     deleteError: 'Dykket kunne ikke slettes. Prøv igen.',
+    logbookPage: 'Side fra den gamle logbog',
+    logbookPageHint:
+      'Billede af dykket i din papir-logbog. Den gemmes også på telefonen, så den kan vises uden dækning.',
     importTitle: 'Importér dyk',
     importHint:
       'Indlæs dyk fra en importfil, f.eks. dine dyk hentet fra SSI-logbogen. Dyk, der allerede er importeret, springes over.',
@@ -106,6 +109,9 @@ export const divesTexts = defineTexts({
     loadError: 'Could not load your dives. Check your connection.',
     saveError: 'The dive could not be saved. Check your connection and try again.',
     deleteError: 'The dive could not be deleted. Please try again.',
+    logbookPage: 'Page from the old logbook',
+    logbookPageHint:
+      'Photo of the dive in your paper logbook. It is also stored on the phone, so it can be shown without coverage.',
     importTitle: 'Import dives',
     importHint:
       "Load dives from an import file, e.g. your dives fetched from SSI's logbook. Dives already imported are skipped.",

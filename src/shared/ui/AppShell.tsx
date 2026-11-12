@@ -7,7 +7,6 @@ import styles from './AppShell.module.css'
 const TABS: { to: string; label: TextKey; icon: string; end?: boolean }[] = [
   { to: '/', label: 'common.navDives', icon: '🤿', end: true },
   { to: '/kloden', label: 'common.navGlobe', icon: '🌍' },
-  { to: '/logboeger', label: 'common.navLogbooks', icon: '📖' },
   { to: '/profil', label: 'common.navProfile', icon: '🪪' },
 ]
 

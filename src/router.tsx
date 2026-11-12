@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ReactNode } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { RequireAuth } from './features/auth/components/RequireAuth'
 import { DiveListPage } from './features/dives/components/DiveListPage'
 import { AppShell } from './shared/ui/AppShell'
@@ -16,9 +16,6 @@ const DiveFormPage = lazy(() =>
 )
 const GlobePage = lazy(() =>
   import('./features/globe/components/GlobePage').then((m) => ({ default: m.GlobePage })),
-)
-const LogbookPage = lazy(() =>
-  import('./features/logbook/components/LogbookPage').then((m) => ({ default: m.LogbookPage })),
 )
 const ProfilePage = lazy(() =>
   import('./features/profile/components/ProfilePage').then((m) => ({ default: m.ProfilePage })),
@@ -49,7 +46,8 @@ export const router = createBrowserRouter([
       { path: 'dyk/:diveId', element: page(<DiveDetailPage />) },
       { path: 'dyk/:diveId/rediger', element: page(<DiveFormPage />) },
       { path: 'kloden', element: page(<GlobePage />) },
-      { path: 'logboeger', element: page(<LogbookPage />) },
+      // Den gamle logbogsfane er erstattet af en logbogsside på hvert dyk.
+      { path: 'logboeger', element: <Navigate to="/" replace /> },
       { path: 'profil', element: page(<ProfilePage />) },
       { path: 'profil/certifikat/nyt', element: page(<CertificateFormPage />) },
       { path: 'profil/certifikat/:certId', element: page(<CertificateFormPage />) },

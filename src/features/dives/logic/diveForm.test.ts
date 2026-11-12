@@ -56,7 +56,14 @@ describe('formToDive', () => {
       startBar: '230',
       endBar: '50',
     }
-    const dive = { ...formToDive(form), sitePhotoPath: null, source: 'app' as const, ssiId: null }
+    const dive = {
+      ...formToDive(form),
+      sitePhotoPath: null,
+      logbookPagePath: null,
+      logbookPageSmallPath: null,
+      source: 'app' as const,
+      ssiId: null,
+    }
     expect(diveToForm(dive)).toEqual(form)
   })
 })

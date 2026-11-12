@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useStorageUrl } from '../../../shared/hooks/useStorageUrl'
+import { formatNumber } from '../../../shared/utils/numbers'
 import { useT } from '../../../shared/i18n/useT'
 import { Button } from '../../../shared/ui/Button'
 import { StarRating } from '../../../shared/ui/StarRating'
@@ -54,7 +55,10 @@ function DiveDetail({ dive }: { dive: Dive }) {
 
       <div className={styles.headline}>
         <div>
-          <span className={styles.big}>{dive.maxDepthM ?? '–'}</span> m
+          <span className={styles.big}>
+            {dive.maxDepthM === null ? '–' : formatNumber(dive.maxDepthM, locale)}
+          </span>{' '}
+          m
         </div>
         <div>
           <span className={styles.big}>{dive.diveTimeMin ?? '–'}</span> min

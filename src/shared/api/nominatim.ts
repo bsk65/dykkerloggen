@@ -48,7 +48,9 @@ export function mapReverseResult(result: NominatimReverse): ReverseGeocodeResult
     a.city ||
     null
   return {
-    placeName: placeName ?? null,
+    // Uden noget nærmere sted svarer Nominatim med selve landet — det er
+    // ikke et brugbart navn på et dykkersted.
+    placeName: placeName && placeName !== a.country && placeName !== a.state ? placeName : null,
     country: a.country ?? null,
     region: a.municipality ?? a.county ?? a.state ?? a.region ?? null,
   }

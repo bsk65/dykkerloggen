@@ -16,6 +16,12 @@ describe('mapReverseResult', () => {
     ).toEqual({ placeName: 'Kikhavn Strand', country: 'Danmark', region: 'Halsnæs Kommune' })
   })
 
+  it('does not suggest the country itself as a site name', () => {
+    expect(mapReverseResult({ name: 'Danmark', address: { country: 'Danmark' } }).placeName).toBe(
+      null,
+    )
+  })
+
   it('handles an empty answer (open sea)', () => {
     expect(mapReverseResult({})).toEqual({ placeName: null, country: null, region: null })
   })
